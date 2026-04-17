@@ -1,0 +1,17 @@
+{
+  "name": "project-skills",
+  "owner": {
+    "name": "Diego Credidio",
+    "url": "https://github.com/diegocredidio"
+  },
+  "plugins": [
+    {
+      "name": "project-skills",
+      "source": "./",
+      "description": "PM planning pipeline + design system workflow + backend/frontend decomposition + Kanban sync to Jira.",
+      "version": "1.0.0",
+      "category": "planning",
+      "tags": ["pm", "planning", "prd", "design", "backend", "frontend", "kanban"]
+    }
+  ]
+}

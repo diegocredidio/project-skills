@@ -1,0 +1,41 @@
+{
+  "name": "project-skills",
+  "version": "1.0.0",
+  "description": "PM + Design + Backend + Frontend + Kanban skill-set for Claude Code: from vague idea to structured artifacts, with Jira sync.",
+  "keywords": [
+    "pm",
+    "product-manager",
+    "prd",
+    "planning",
+    "architecture",
+    "workstreams",
+    "tasks",
+    "design-system",
+    "backend",
+    "frontend",
+    "kanban",
+    "jira",
+    "claude-code",
+    "claude-code-plugin",
+    "agent-skills",
+    "skills"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diegocredidio/project-skills.git"
+  },
+  "homepage": "https://github.com/diegocredidio/project-skills#readme",
+  "bugs": {
+    "url": "https://github.com/diegocredidio/project-skills/issues"
+  },
+  "author": "Diego Credidio",
+  "license": "MIT",
+  "files": [
+    ".claude-plugin",
+    "skills",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "private": true
+}

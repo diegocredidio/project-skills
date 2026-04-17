@@ -1,0 +1,19 @@
+.DS_Store
+node_modules/
+*.log
+.env
+.env.local
+.idea/
+*.swp
+
+# User artifact directories (created when skills run against a target repo)
+.pm/
+.design/
+.backend/
+.frontend/
+
+# Vercel skills CLI lockfile (if user uses this path locally)
+skills-lock.json
+
+# Claude Code workspace state (this repo is a plugin source, not a workspace)
+.claude/
