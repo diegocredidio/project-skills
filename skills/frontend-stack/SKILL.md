@@ -15,6 +15,8 @@ Read `.frontend/<feature>/FRONTEND_INTAKE.md`. If missing, direct user to run `f
 
 Read `.pm/<feature>/PROJECT_PROFILE.md` to get `designMode` and `uiFramework`. If missing, prompt the user once and create it (same migration prompt used by `pm-handoff` and `design-flow`).
 
+Read `.qa/<feature>/QA_STRATEGY.md` if it exists. It declares testing tooling decisions that frontend-stack must be consistent with.
+
 Also read `.design/<feature>/TOKENS.md` if present — it constrains styling choices.
 
 ### Step 2: Fill the 8-row decision table
@@ -42,6 +44,16 @@ Cross-check the Component library row against `PROJECT_PROFILE.md`:
   > "Conflito: PROJECT_PROFILE diz `shadcn-theme` mas você escolheu `[X]` como Component library. Reconcile antes de continuar: ou troque o Component library para `shadcn/ui`, ou edite `.pm/<feature>/PROJECT_PROFILE.md` para `designMode: custom-system`."
 
 - If `designMode: custom-system` AND Component library = `shadcn/ui` → proceed, but note in the decision log that shadcn is being used as a primitive base under a custom token system (valid, just explicit).
+
+### Step 2.6: QA tooling consistency check
+
+If `.qa/<feature>/QA_STRATEGY.md` exists, cross-check the Testing row of the decision table against its tool choices:
+
+- If frontend-stack picks a testing tool (e.g., Cypress) different from what QA_STRATEGY specified (e.g., Playwright) → **warn** in the decision log; do not abort:
+
+  > "Nota: frontend-stack escolheu `[X]` para testes, mas QA_STRATEGY diz `[Y]`. Reconcile no decision log ou edite um dos dois. Não é bloqueante — ferramentas de teste são negociáveis."
+
+Testing-tool conflicts are negotiable (dev and QA can reach alignment later); shadcn/ui is structural (Step 2.5 — aborts).
 
 ### Step 3: Coding conventions
 
