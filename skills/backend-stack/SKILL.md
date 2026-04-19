@@ -15,6 +15,8 @@ Read `.backend/<feature>/BACKEND_INTAKE.md`. Extract resolved decisions, codebas
 
 If BACKEND_INTAKE.md does not exist, abort. Tell the user: "Run `backend-brief-intake` first — I need the gap-fill grill results."
 
+Read `.qa/<feature>/QA_STRATEGY.md` if it exists. It declares testing tooling decisions that backend-stack must be consistent with.
+
 ### Step 2: Fill the stack decision table
 
 For each row, either confirm what intake resolved or decide now if deferred. Every choice needs a rationale.
@@ -29,6 +31,16 @@ For each row, either confirm what intake resolved or decide now if deferred. Eve
 | Auth | Clerk / Auth0 / Supabase / roll-your-own (JWT+bcrypt) | Clerk (provider) |
 | Testing | Vitest + Supertest / Jest / pytest / go test | Vitest + Supertest |
 | Hosting | Railway / Fly.io / Vercel / AWS / container + PaaS | Railway |
+
+### Step 2.5: QA tooling consistency check
+
+If `.qa/<feature>/QA_STRATEGY.md` exists, cross-check the Testing row of the decision table against its tool choices:
+
+- If backend-stack picks a testing tool different from what QA_STRATEGY specified → **warn** in the decision log; do not abort:
+
+  > "Nota: backend-stack escolheu `[X]` para testes, mas QA_STRATEGY diz `[Y]`. Reconcile no decision log ou edite um dos dois. Não é bloqueante — ferramentas de teste são negociáveis."
+
+Typical conflicts to flag: supertest vs QA-specified API testing via Playwright request fixtures; coverage tool mismatch (nyc / c8 / v8 native); integration-test framework mismatch. Testing-tool conflicts are negotiable. API contract testing approaches should stay aligned to avoid coverage gaps.
 
 ### Step 3: Render the folder structure
 
