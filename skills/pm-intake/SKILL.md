@@ -41,6 +41,7 @@ Read the entire document and extract structured information across these categor
 - Security or compliance requirements
 - Existing systems to integrate with
 - UI framework or component library mentioned (shadcn/ui, MUI, Chakra, custom design system)
+- Testing infrastructure / rigor — test framework mentioned (Vitest, Jest, Playwright, Cypress, pytest), coverage targets, CI gates (used to decide `testingRigor` in PROJECT_PROFILE.md)
 
 **Organizational categories:**
 - Team or roles mentioned
@@ -66,6 +67,8 @@ Examples:
 | "Supports mobile and desktop" | ⚠️ Ambiguous | No breakpoints, no native vs. responsive specified |
 | "Built with shadcn/ui" | ✅ Clear | UI framework set → designMode = shadcn-theme |
 | "(no UI framework or component library mentioned)" | ❌ Missing | Critical gap — designMode must be resolved before design-flow |
+| "Playwright E2E with 80% coverage" | ✅ Clear | Testing stack + target set → `testingRigor = full` inferível |
+| "(no testing strategy mentioned)" | ⚠️ Ambiguous | Gap importante — resolvable in qa-strategy if not resolved in grill |
 
 ### Step 4: Generate the gap list
 
