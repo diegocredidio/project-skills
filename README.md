@@ -35,6 +35,17 @@ pm-flow
  design-review       backend-review                        frontend-review
 ```
 
+### Design modes
+
+`pm-grill` asks early which mode you're in — the answer branches `design-tokens` and `design-components` behavior, and `frontend-components` follows suit:
+
+- **`shadcn-theme`** (MVP with shadcn/ui) — designer delivers a slim theme (HSL CSS vars + radius + font, via [tweakcn](https://tweakcn.com) or a shadcn preset) + screen-centric specs (shadcn component inventory, custom variants, roll-your-own). `frontend-components` emits `npx shadcn add` plans instead of per-primitive specs.
+- **`custom-system`** — full token architecture (spacing, typography, motion, z-index) + primitive specs from scratch.
+
+The choice lives in `.pm/<feature>/PROJECT_PROFILE.md` and is read by six downstream skills (`pm-handoff`, `design-flow`, `design-tokens`, `design-components`, `frontend-stack`, `frontend-components`). `frontend-stack` aborts on conflicts (e.g., `shadcn-theme` + non-shadcn component library).
+
+See [`docs/skills-flow.md`](docs/skills-flow.md) for the full mermaid-rendered flow map (including branching).
+
 Then, whenever you're ready to put the plan on a board:
 
 ```
@@ -75,6 +86,7 @@ Every skill reads from and writes to `.<discipline>/<feature>/` in the target re
 .pm/<feature>/
   ├── INTAKE.md              (pm-intake)
   ├── GRILL_SUMMARY.md       (pm-grill)
+  ├── PROJECT_PROFILE.md     (pm-grill — designMode + uiFramework; read by 6 downstream skills)
   ├── PRD.md                 (pm-prd)
   ├── ARCHITECTURE.md        (pm-architecture)
   ├── WORKSTREAMS.md         (pm-workstreams)
