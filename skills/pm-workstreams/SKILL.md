@@ -1,6 +1,6 @@
 ---
 name: pm-workstreams
-description: Reads prior PM artifacts from `.pm/<feature>/PRD.md` and `ARCHITECTURE.md` and produces `.pm/<feature>/WORKSTREAMS.md` — the discipline breakdown (backend / frontend / design) with ownership boundaries and interfaces. Use when user says "split into workstreams", "divide the work", "who does what", or when the pm-flow orchestrator triggers this step. Not for generic team topology discussions or org-chart planning.
+description: Reads prior PM artifacts from `.pm/<feature>/PRD.md` and `ARCHITECTURE.md` and produces `.pm/<feature>/WORKSTREAMS.md` — the discipline breakdown (backend / frontend / design / QA) with ownership boundaries and interfaces. Use when user says "split into workstreams", "divide the work", "who does what", or when the pm-flow orchestrator triggers this step. Not for generic team topology discussions or org-chart planning.
 ---
 
 # PM Workstreams — Discipline Breakdown
@@ -20,6 +20,7 @@ Read these in order:
 ### Step 2: Ask workstream-specific questions
 
 - "Does your team have dedicated backend, frontend, and design roles, or are people full-stack?"
+- "Is there a dedicated QA owner, or do devs own their own testing (full-stack pattern)?"
 - "Is there a designer involved, or should the design workstream be developer-handled?"
 - "Are there any existing design systems or component libraries to use?"
 - "What's the handoff process between design and development in your team?"
@@ -52,6 +53,7 @@ For each workstream, define:
 | Backend | [TBD] | [1-line scope] | Design (API contracts) |
 | Frontend | [TBD] | [1-line scope] | Backend (APIs), Design (specs) |
 | Design | [TBD] | [1-line scope] | PRD (requirements) |
+| QA | [TBD] | [1-line scope] | PRD (FR-XXX), Architecture (test seams), Design (a11y) |
 
 ---
 
@@ -155,6 +157,44 @@ For each workstream, define:
 - Responsive across defined breakpoints
 - Accessibility audit passing
 - Tests passing on critical user flows
+
+---
+
+## 4. QA Workstream
+
+### Scope
+Test strategy, automation, and review of the build.
+
+### Deliverables
+- [ ] `QA_STRATEGY.md` — test approach aligned to `testingRigor`
+- [ ] `TEST_CASES.md` — cases mapped to FR-XXX and journeys
+- [ ] `QA_TASKS.md` — automation and manual task breakdown
+- [ ] `QA_REVIEW.md` — green/red status per release
+- [ ] API contract tests (block merge when `testingRigor = full`)
+- [ ] E2E coverage for critical journeys
+- [ ] Accessibility checks against Design component specs
+- [ ] Regression gap log
+
+### Functional requirements covered
+[List the FR-XXX IDs this workstream addresses — every `must` FR must be covered]
+
+### Dependencies
+- **Needs from PRD:** FR-XXX and user journeys
+- **Needs from Architecture:** Test seams, `testingRigor` level
+- **Needs from Design:** Component specs for a11y
+- **Needs from Backend:** API contracts for integration tests
+- **Needs from Frontend:** Routes + UI for E2E; E2E selector stability
+- **Produces for PM:** Green-for-release definition and status
+
+### Interface contracts
+- **Backend:** API contract tests block merge when `testingRigor = full`
+- **Frontend:** E2E selector stability — frontend commits to not breaking test selectors without coordination
+- **PM:** Green-for-release definition
+
+### Definition of done
+- qa-review produces green status
+- All `must` FR-XXX covered
+- Regression gaps logged and prioritized
 
 ---
 
