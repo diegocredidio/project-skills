@@ -87,7 +87,7 @@ Before asking anything, identify the main branches that need resolution. Present
 - Scale: How many users? How much data? Growth trajectory?
 - Constraints: Compliance? Accessibility? Performance? Budget?
 - Existing codebase: What already exists that we need to respect or integrate with?
-- Delivery profile: Design mode — `shadcn-theme` (MVP, designer delivers shadcn theme + screen specs) or `custom-system` (full design system, tokens + primitives from scratch)? UI framework — `shadcn/ui`, other, or none?
+- Delivery profile: Design mode — `shadcn-theme` or `custom-system`? UI framework — `shadcn/ui`, other, or none?
 
 **Organizational branches:**
 - Team: Who's building? What skills are available?
