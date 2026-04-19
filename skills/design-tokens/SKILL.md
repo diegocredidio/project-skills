@@ -12,9 +12,15 @@ Generates the semantic token layer that every downstream UI decision will refere
 ### Step 1: Load inputs
 
 Read:
+- `.pm/<feature>/PROJECT_PROFILE.md` — get `designMode`. MUST exist (pm-handoff or design-flow creates it). Branch behavior at Step 2 based on this value.
 - `.design/<feature>/DESIGN_BRIEF.md` (aesthetic direction, tone, density)
 - `.design/<feature>/CODEBASE_AUDIT.md` (existing tokens to respect)
 - Optionally `.design/<feature>/IA.md` (to anticipate screens that need tokens)
+
+### Step 1.5: Branch on designMode
+
+- **`designMode: shadcn-theme`** → skip Steps 5, 6, 7 (spacing scale, typography scale, radius/motion/breakpoints/z-index). Go to the **Shadcn-theme mode** section at the end of this skill. The canonical output in that mode is a slim TOKENS.md with theme vars + radius + font only.
+- **`designMode: custom-system`** → follow Steps 2–9 as written (full token system).
 
 ### Step 2: Decide the target code format
 
@@ -194,3 +200,95 @@ Tell the user: "Tokens specced. These are the only values downstream components 
 - Dark-first means dark palette is designed intentionally (not auto-inverted). Light palette is derived, not the other way around.
 - If the codebase already has a token with the same semantic role but a different name, keep the existing name. Consistency beats purity.
 - All color pairs must pass WCAG AA contrast for their intended use (4.5:1 body text, 3:1 large text / UI). Flag any that don't.
+- Read `.pm/<feature>/PROJECT_PROFILE.md` at Step 1. If `designMode: shadcn-theme`, jump to the Shadcn-theme mode section at the end — skip Steps 5–7. The output is a slim TOKENS.md, not a full token system.
+
+---
+
+## Shadcn-theme mode
+
+Use when `PROJECT_PROFILE.md` has `designMode: shadcn-theme`. The designer is delivering a shadcn theme (not a full token system), so output is intentionally slim.
+
+### Accepted inputs (any one)
+
+- **Tweakcn export** — paste the CSS block the user exported from https://tweakcn.com (contains `--background`, `--foreground`, `--primary`, `--radius`, etc.).
+- **Shadcn preset name** — one of `slate`, `zinc`, `stone`, `gray`, `neutral`, etc. Resolve to the preset's CSS block from https://ui.shadcn.com/docs/theming.
+- **Manual answers** — short prompts:
+  - Primary palette: one hue family (e.g., blue, violet, emerald) + saturation intensity (bold / muted)
+  - Dark mode: yes/no + same hue or shifted
+  - Radius: `0` | `0.3rem` | `0.5rem` | `0.75rem` | `1rem`
+  - Font stack: sans + mono
+
+Ask once at Step 1. Don't re-ask if already declared in DESIGN_BRIEF.
+
+### Respect what already exists
+
+If `CODEBASE_AUDIT.md` reports that the project already has shadcn CSS vars in `globals.css`, do not regenerate — only close gaps (missing dark variant, missing `--destructive`, missing `--ring`, etc.).
+
+### Contrast verification
+
+Run WCAG AA checks on the critical pairs:
+- `--primary` on `--primary-foreground`
+- `--background` on `--foreground`
+- `--destructive` on `--destructive-foreground`
+- `--muted-foreground` on `--background` (body text)
+
+Flag any that fail.
+
+### Write TOKENS.md (shadcn-theme shape)
+
+Save to `.design/<feature>/TOKENS.md`:
+
+````markdown
+# Design Tokens: [Feature Name] (shadcn-theme mode)
+
+## Theme source
+[tweakcn export paste / shadcn preset "<name>" / manual answers]
+
+## CSS variables
+
+```css
+:root {
+  --background: ...; --foreground: ...;
+  --card: ...; --card-foreground: ...;
+  --popover: ...; --popover-foreground: ...;
+  --primary: ...; --primary-foreground: ...;
+  --secondary: ...; --secondary-foreground: ...;
+  --muted: ...; --muted-foreground: ...;
+  --accent: ...; --accent-foreground: ...;
+  --destructive: ...; --destructive-foreground: ...;
+  --border: ...; --input: ...; --ring: ...;
+  --radius: 0.5rem;
+}
+.dark {
+  --background: ...;
+  /* ... dark overrides ... */
+}
+```
+
+## Font stack
+- Sans: Inter, system-ui, sans-serif
+- Mono: JetBrains Mono, monospace
+
+## What this mode does NOT include
+- Full spacing scale (shadcn uses Tailwind defaults)
+- Typography scale (shadcn primitives set their own)
+- Motion tokens (shadcn uses Tailwind transition defaults)
+- Z-index scale (shadcn components manage internally)
+
+## Contrast verification
+
+| Pair | Ratio | Pass |
+|------|-------|------|
+| `--foreground` on `--background` | 13.4:1 | ✓ AA |
+| `--primary-foreground` on `--primary` | 5.8:1 | ✓ AA |
+| `--muted-foreground` on `--background` | 4.7:1 | ✓ AA body |
+
+## Applied to codebase
+**Kept as-is:** [list]
+**Added:** [list]
+**Modified:** [list + rationale]
+````
+
+### Hand off
+
+"Tema shadcn specced. Próximo: `design-components` em modo shadcn-theme — ele vai mapear telas para componentes shadcn em vez de re-especificar primitivos."
