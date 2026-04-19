@@ -12,7 +12,7 @@ Generates the semantic token layer that every downstream UI decision will refere
 ### Step 1: Load inputs
 
 Read:
-- `.pm/<feature>/PROJECT_PROFILE.md` — get `designMode`. MUST exist (pm-handoff or design-flow creates it). Branch behavior at Step 2 based on this value.
+- `.pm/<feature>/PROJECT_PROFILE.md` — get `designMode`. MUST exist (pm-handoff or design-flow creates it). Branch behavior at Step 1.5 based on this value.
 - `.design/<feature>/DESIGN_BRIEF.md` (aesthetic direction, tone, density)
 - `.design/<feature>/CODEBASE_AUDIT.md` (existing tokens to respect)
 - Optionally `.design/<feature>/IA.md` (to anticipate screens that need tokens)
@@ -257,6 +257,11 @@ Save to `.design/<feature>/TOKENS.md`:
   --accent: ...; --accent-foreground: ...;
   --destructive: ...; --destructive-foreground: ...;
   --border: ...; --input: ...; --ring: ...;
+  --chart-1: ...; --chart-2: ...; --chart-3: ...; --chart-4: ...; --chart-5: ...;
+  --sidebar: ...; --sidebar-foreground: ...;
+  --sidebar-primary: ...; --sidebar-primary-foreground: ...;
+  --sidebar-accent: ...; --sidebar-accent-foreground: ...;
+  --sidebar-border: ...; --sidebar-ring: ...;
   --radius: 0.5rem;
 }
 .dark {
