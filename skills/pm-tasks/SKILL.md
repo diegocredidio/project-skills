@@ -132,14 +132,66 @@ TASK-001 (Foundation)
 
 ## Summary
 
-| Phase | Tasks | Backend | Frontend | Design | Estimated total |
-|-------|-------|---------|----------|--------|----------------|
-| Foundation | [N] | [N] | [N] | [N] | [N days] |
-| Core journeys | [N] | [N] | [N] | [N] | [N days] |
-| Secondary | [N] | [N] | [N] | [N] | [N days] |
-| Polish | [N] | [N] | [N] | [N] | [N days] |
-| **Total** | **[N]** | **[N]** | **[N]** | **[N]** | **[N days]** |
+| Phase | Tasks | Backend | Frontend | Design | QA | Estimated total |
+|-------|-------|---------|----------|--------|----|----------------|
+| Foundation | [N] | [N] | [N] | [N] | [N] | [N days] |
+| Core journeys | [N] | [N] | [N] | [N] | [N] | [N days] |
+| Secondary | [N] | [N] | [N] | [N] | [N] | [N days] |
+| Polish | [N] | [N] | [N] | [N] | [N] | [N days] |
+| **Total** | **[N]** | **[N]** | **[N]** | **[N]** | **[N]** | **[N days]** |
+
+---
+
+## Backend tasks
+
+See `.backend/<feature>/BACKEND_TASKS.md` for detail.
+
+- **Count:** [N]
+- **Effort breakdown:** Small: X | Medium: Y | Large: Z
+- **Critical path:** [brief description]
+
+## Frontend tasks
+
+See `.frontend/<feature>/FRONTEND_TASKS.md` for detail.
+
+- **Count:** [N]
+- **Effort breakdown:** Small: X | Medium: Y | Large: Z
+- **Critical path:** [brief description]
+
+## Design tasks
+
+See `.design/<feature>/DESIGN_TASKS.md` for detail.
+
+- **Count:** [N]
+- **Effort breakdown:** Small: X | Medium: Y | Large: Z
+- **Critical path:** [brief description]
+
+## QA tasks
+
+See `.qa/<feature>/QA_TASKS.md` for detail.
+
+- **Count:** [N]
+- **Effort breakdown:** Small: X | Medium: Y | Large: Z
+- **Critical path:** [brief description]
 ```
+
+### Step 4.5: Cross-reference discipline task files
+
+The TASKS.md template includes summary sections for each discipline (Backend / Frontend / Design / QA) that cross-reference the detailed discipline-specific task files produced by the sibling flows.
+
+For each discipline, check whether its TASKS file exists and populate accordingly:
+
+- **Backend:** read `.backend/<feature>/BACKEND_TASKS.md` if present; otherwise emit `Backend tasks: TBD — run \`backend-flow\` to generate.`
+- **Frontend:** read `.frontend/<feature>/FRONTEND_TASKS.md` if present; otherwise emit `Frontend tasks: TBD — run \`frontend-flow\` to generate.`
+- **Design:** read `.design/<feature>/DESIGN_TASKS.md` if present; otherwise emit `Design tasks: TBD — run \`design-flow\` to generate.`
+- **QA:** read `.qa/<feature>/QA_TASKS.md` if present; otherwise emit `QA tasks: TBD — run \`qa-flow\` to generate.`
+
+When the discipline file exists, populate the section with:
+- Task count (from the discipline's task list)
+- Effort breakdown (count of Small / Medium / Large tasks)
+- Critical path (one-line description of the blocking sequence, if evident)
+
+This keeps TASKS.md as the single-pane overview while each discipline owns its detailed decomposition.
 
 ### Step 5: Save
 
