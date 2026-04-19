@@ -56,9 +56,9 @@ For each question, offer a default the user can accept with "yes":
 
 - "Unit framework — Vitest or Jest? Default: Vitest for Vite projects, Jest otherwise."
 - "E2E — Playwright or Cypress? Default: Playwright unless team already owns Cypress."
-- "Coverage target? Default: match `testingRigor` from PROJECT_PROFILE.md (mvp=none, standard=70%, rigorous=85%)."
+- "Coverage target? Default: match `testingRigor` from PROJECT_PROFILE.md (mvp=reasonable non-numeric; full=80% lines / 70% branches)."
 - "Mocking strategy — MSW, in-memory stubs, or record/replay? Default: MSW for HTTP, manual stubs for units."
-- "A11y tooling — axe-core + jest-axe, or manual only? Default: axe in CI for rigorous; manual for mvp."
+- "A11y tooling — axe-core + jest-axe, or manual only? Default: axe in CI for full; manual for mvp."
 - "Bug tracker — GitHub Issues / Jira / Linear? Default: whatever the repo already integrates with."
 
 If the user answers vaguely, probe with "concretely, which?" — don't accept "we'll figure it out later" for Critical items.
