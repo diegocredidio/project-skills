@@ -1,6 +1,6 @@
 ---
 name: kanban-sync
-description: Reads `.pm/<feature>/PRD.md`, `.pm/<feature>/TASKS.md`, and (if present) `.design/<feature>/DESIGN_TASKS.md`, `.backend/<feature>/BACKEND_TASKS.md`, `.frontend/<feature>/FRONTEND_TASKS.md` along with `.pm/jira-config.md`, and creates / updates Jira issues. Hierarchy adapts to project style — team-managed (simplified=true) uses Epic → Task directly; company-managed uses Epic per feature → Story per phase → Task. Writes dependency links from `requires:` fields. Idempotent — re-runs use `.pm/<feature>/JIRA_MAP.md` to update existing instead of duplicating. Use when kanban-flow invokes it or when user says "sync to Jira", "push tasks to Jira", "create issues". Not for creating Jira projects or for running Scrum ceremonies.
+description: Reads `.pm/<feature>/PRD.md`, `.pm/<feature>/TASKS.md`, and (if present) `.design/<feature>/DESIGN_TASKS.md`, `.backend/<feature>/BACKEND_TASKS.md`, `.frontend/<feature>/FRONTEND_TASKS.md`, `.qa/<feature>/QA_TASKS.md` along with `.pm/jira-config.md`, and creates / updates Jira issues. Hierarchy adapts to project style — team-managed (simplified=true) uses Epic → Task directly; company-managed uses Epic per feature → Story per phase → Task. Writes dependency links from `requires:` fields. Idempotent — re-runs use `.pm/<feature>/JIRA_MAP.md` to update existing instead of duplicating. Use when kanban-flow invokes it or when user says "sync to Jira", "push tasks to Jira", "create issues". Not for creating Jira projects or for running Scrum ceremonies.
 ---
 
 # Kanban Sync — Tasks to Jira via MCP
@@ -53,6 +53,7 @@ Read in this order:
 - `.design/<feature>/DESIGN_TASKS.md` if exists → design stories / tasks
 - `.backend/<feature>/BACKEND_TASKS.md` if exists → backend stories / tasks
 - `.frontend/<feature>/FRONTEND_TASKS.md` if exists → frontend stories / tasks
+- `.qa/<feature>/QA_TASKS.md` if exists → qa stories / tasks
 
 ### Step 3: Dry run preview
 
@@ -147,7 +148,7 @@ Capture the returned Jira key (e.g., `PROJ-100`). Save to `JIRA_MAP.md` IMMEDIAT
 - `issueType`: `taskIssueTypeId`
 - `summary`: task title from the TASKS.md (e.g., `"Scaffold project"`) — **NO** `[TASK-001]` prefix in summary; the local task ID lives in JIRA_MAP.md
 - `description`: follow Step 6 below
-- `labels`: `[<discipline>]` (`pm` / `design` / `backend` / `frontend`) — single label, no prefixes
+- `labels`: `[<discipline>]` — single label, no prefixes. Map: `pm: pm`, `design: design`, `backend: backend`, `frontend: frontend`, `qa: qa`.
 - **Custom field `Effort`**: set via `fields: { [effortFieldId]: { id: effortOptions[size] } }` where `size` is `Small` / `Medium` / `Large` from the TASKS.md task size (S/M/L → Small/Medium/Large)
 - Any required custom fields from `customFieldsRequired` in config
 
@@ -173,7 +174,7 @@ The Jira MCP converts our Markdown to ADF (Atlassian Document Format). The parse
 
 <texto livre — 1-3 parágrafos>
 
-**Workstream:** <pm | design | backend | frontend>
+**Workstream:** <pm | design | backend | frontend | qa>
 
 **Effort:** <Small | Medium | Large>
 
