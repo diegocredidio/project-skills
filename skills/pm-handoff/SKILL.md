@@ -21,6 +21,16 @@ If any are missing, warn the user: "The [file] is missing. You can run `pm-[step
 
 Optional but useful: `GRILL_SUMMARY.md`, `REVIEW.md`, `INTAKE.md`
 
+### Step 1.5: Read PROJECT_PROFILE.md
+
+Read `.pm/<feature-name>/PROJECT_PROFILE.md` to get `designMode` and `uiFramework`.
+
+If the file is missing (legacy project pre-dating this convention), prompt once:
+
+> "Este projeto não tem PROJECT_PROFILE.md. Modo de design: **shadcn-theme** ou **custom-system**? (Escolha grava em `.pm/<feature-name>/PROJECT_PROFILE.md` — afeta design-tokens e design-components.)"
+
+Write the file with the user's answer and continue. Do NOT re-run pm-grill.
+
 ### Step 2: Ask which workstreams to hand off
 
 > "Which workstreams do you want to start? You can pick one now and come back for the others later — or start all three."
@@ -46,6 +56,9 @@ Save to `.design/<feature-name>/DESIGN_BRIEF.md` — this is the canonical input
 
 ```markdown
 # Design Brief: [Feature/Project Name]
+
+**designMode:** [shadcn-theme | custom-system — from PROJECT_PROFILE.md]
+**uiFramework:** [shadcn/ui | <other> | none — from PROJECT_PROFILE.md]
 
 ## Project context
 [2-3 sentences from the PRD problem statement and solution]
@@ -149,6 +162,9 @@ Save to `.frontend/<feature-name>/FRONTEND_BRIEF.md`.
 ```markdown
 # Frontend Brief: [Feature/Project Name]
 
+**designMode:** [shadcn-theme | custom-system — from PROJECT_PROFILE.md]
+**uiFramework:** [shadcn/ui | <other> | none — from PROJECT_PROFILE.md]
+
 ## What we're building
 [1 paragraph from PRD — the frontend perspective]
 
@@ -228,3 +244,4 @@ If all three are running in parallel, remind the user of the sequencing reality:
 - The DESIGN_BRIEF.md format must be compatible with the in-package `design-brief-intake` skill input
 - If a required piece of information is missing from PM artifacts, flag it in the briefing as `[TO BE DEFINED]` rather than inventing it
 - The handoff is one-way — do not loop back into PM skills from here. If new requirements emerge during specialist work, use `pm-review` to reassess
+- Read `.pm/<feature>/PROJECT_PROFILE.md` before generating briefs. If missing, prompt once and create it — do NOT re-run pm-grill.
