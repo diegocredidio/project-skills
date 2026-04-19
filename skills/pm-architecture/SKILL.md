@@ -22,6 +22,16 @@ Read these in order:
    - `.env.example`, config files — environment and integrations
    - Component library, design system files — frontend patterns
 
+### Step 1.5: Read PROJECT_PROFILE.md
+
+Read `.pm/<feature-name>/PROJECT_PROFILE.md` to get `testingRigor` (and `designMode`, if present). This value drives the `## Testability` section emitted in Step 3.
+
+If the file is missing, prompt once:
+
+> "Este projeto não tem PROJECT_PROFILE.md completo. Modo de design: **shadcn-theme** ou **custom-system**? Rigor de teste: **mvp** ou **full**? (Respostas gravam em `.pm/<feature-name>/PROJECT_PROFILE.md` — afetam design-tokens, design-components, qa-strategy, qa-review.)"
+
+Write the answers to `.pm/<feature-name>/PROJECT_PROFILE.md`, then proceed.
+
 ### Step 2: Ask architecture-specific questions
 
 Based on what you found (or didn't find), ask:
@@ -135,13 +145,27 @@ A high-level diagram description — what talks to what.]
 |--------|---------|----------|-------------|
 | [External service] | [Why] | [REST/gRPC/etc] | [API key/OAuth/etc] |
 
-## 8. Technical Risks
+## 8. Testability
+
+**testingRigor:** [mvp | full — from PROJECT_PROFILE.md]
+
+For `full` rigor, architecture MUST provide:
+- Seams for mocking external dependencies (interfaces / ports / adapters)
+- A dedicated test database or a migration-safe test schema
+- API designed for contract testing (versioned, deterministic error shapes)
+- Observability hooks accessible from tests (log capture, trace IDs)
+
+For `mvp` rigor, these are nice-to-haves; defer until scope grows.
+
+Flag any architectural decisions above that would block the chosen rigor level.
+
+## 9. Technical Risks
 
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|------------|------------|
 | [Risk] | [H/M/L] | [H/M/L] | [Plan] |
 
-## 9. Decision Log
+## 10. Decision Log
 
 | # | Decision | Options considered | Chosen | Rationale |
 |---|----------|-------------------|--------|-----------|
