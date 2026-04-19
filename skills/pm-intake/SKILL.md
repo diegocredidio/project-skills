@@ -40,6 +40,7 @@ Read the entire document and extract structured information across these categor
 - Performance or scalability expectations
 - Security or compliance requirements
 - Existing systems to integrate with
+- UI framework / design mode — shadcn/ui, Radix, MUI, custom design system, or not mentioned (used to decide `designMode` in PROJECT_PROFILE.md)
 
 **Organizational categories:**
 - Team or roles mentioned
@@ -63,6 +64,8 @@ Examples:
 | "Users must be authenticated" | ✅ Clear | Unambiguous requirement |
 | "Success metrics" | ❌ Missing | Not mentioned anywhere |
 | "Supports mobile and desktop" | ⚠️ Ambiguous | No breakpoints, no native vs. responsive specified |
+| "Built with shadcn/ui" | ✅ Clear | UI framework set → designMode = shadcn-theme |
+| No UI framework mentioned | ❌ Missing | Critical gap — designMode must be resolved before design-flow |
 
 ### Step 4: Generate the gap list
 
