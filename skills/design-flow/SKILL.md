@@ -42,7 +42,7 @@ If `.design/<feature>/` exists with prior artifacts, show what's present and ask
 
 Read `.pm/<feature>/PROJECT_PROFILE.md` to get `designMode`. If the file is missing:
 
-> "Este projeto não tem PROJECT_PROFILE.md. Modo de design: **shadcn-theme** ou **custom-system**?"
+> "Este projeto não tem PROJECT_PROFILE.md. Modo de design: **shadcn-theme** ou **custom-system**? (Escolha grava em `.pm/<feature-name>/PROJECT_PROFILE.md` — afeta design-tokens e design-components.)"
 
 Write the file with the answer. Then announce the mode to the user:
 

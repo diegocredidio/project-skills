@@ -244,4 +244,4 @@ If all three are running in parallel, remind the user of the sequencing reality:
 - The DESIGN_BRIEF.md format must be compatible with the in-package `design-brief-intake` skill input
 - If a required piece of information is missing from PM artifacts, flag it in the briefing as `[TO BE DEFINED]` rather than inventing it
 - The handoff is one-way — do not loop back into PM skills from here. If new requirements emerge during specialist work, use `pm-review` to reassess
-- Read `.pm/<feature>/PROJECT_PROFILE.md` before generating briefs. If missing, prompt once and create it — do NOT re-run pm-grill.
+- Read `.pm/<feature-name>/PROJECT_PROFILE.md` before generating briefs. If missing, prompt once and create it — do NOT re-run pm-grill.
