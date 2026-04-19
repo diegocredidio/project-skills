@@ -1,6 +1,6 @@
 ---
 name: pm-handoff
-description: Reads prior PM artifacts from `.pm/<feature>/` and produces three discipline-specific briefing files (`.design/<feature>/DESIGN_BRIEF.md`, `.backend/<feature>/BACKEND_BRIEF.md`, `.frontend/<feature>/FRONTEND_BRIEF.md`), then optionally invokes the in-package specialist flows (design-flow, backend-flow, frontend-flow). User picks which workstreams to start now vs. later. Use when user says "handoff", "start building", "generate briefings", "I want to start the backend/design/frontend", "move to execution", or when pm-flow completes. Not for invoking external design-flow packages — this package ships its own design-flow.
+description: Reads prior PM artifacts from `.pm/<feature>/` and produces four discipline-specific briefing files (`.design/<feature>/DESIGN_BRIEF.md`, `.backend/<feature>/BACKEND_BRIEF.md`, `.frontend/<feature>/FRONTEND_BRIEF.md`, `.qa/<feature>/QA_BRIEF.md`), then optionally invokes the in-package specialist flows (design-flow, backend-flow, frontend-flow, qa-flow). User picks which workstreams to start now vs. later. Use when user says "handoff", "start building", "generate briefings", "I want to start the backend/design/frontend/qa", "move to execution", or when pm-flow completes. Not for invoking external design-flow packages — this package ships its own design-flow.
 ---
 
 # PM Handoff — Bridge to Specialist Skill-Sets
@@ -23,24 +23,30 @@ Optional but useful: `GRILL_SUMMARY.md`, `REVIEW.md`, `INTAKE.md`
 
 ### Step 1.5: Read PROJECT_PROFILE.md
 
-Read `.pm/<feature-name>/PROJECT_PROFILE.md` to get `designMode` and `uiFramework`.
+Read `.pm/<feature-name>/PROJECT_PROFILE.md` to get `designMode`, `uiFramework`, and `testingRigor`.
 
 If the file is missing (legacy project pre-dating this convention), prompt once:
 
-> "Este projeto não tem PROJECT_PROFILE.md. Modo de design: **shadcn-theme** ou **custom-system**? (Escolha grava em `.pm/<feature-name>/PROJECT_PROFILE.md` — afeta design-tokens e design-components.)"
+> "Este projeto não tem PROJECT_PROFILE.md completo.
+> Modo de design: **shadcn-theme** ou **custom-system**?
+> Rigor de teste: **mvp** ou **full**?
+> (Respostas gravam em `.pm/<feature-name>/PROJECT_PROFILE.md` — afetam design-tokens, design-components, qa-strategy, qa-review.)"
+
+If the file exists but is missing only one of the two fields (e.g., legacy project with `designMode` but no `testingRigor`), ask only for the missing field; preserve what's there.
 
 Write the file with the user's answer and continue. Do NOT re-run pm-grill.
 
 ### Step 2: Ask which workstreams to hand off
 
-> "Which workstreams do you want to start? You can pick one now and come back for the others later — or start all three."
+> "Which workstreams do you want to start? You can pick one now and come back for the others later — or start all four."
 
 Options:
 - Design → gera `DESIGN_BRIEF.md` e invoca `design-flow`
 - Backend → gera `BACKEND_BRIEF.md` e invoca `backend-flow`
 - Frontend → gera `FRONTEND_BRIEF.md` e invoca `frontend-flow`
-- All three
-- "Just generate the briefings" → gera os três arquivos sem invocar nenhuma skill ainda
+- QA → gera `QA_BRIEF.md` e invoca `qa-flow`
+- All four
+- "Just generate the briefings" → gera os quatro arquivos sem invocar nenhuma skill ainda
 
 Se o usuário quiser apenas um, gera só o briefing daquele e para. Os outros ficam disponíveis para quando ele quiser rodar `backend-flow` ou `frontend-flow` diretamente — essas skills leem os arquivos do disco de forma independente.
 
@@ -211,6 +217,71 @@ Save to `.frontend/<feature-name>/FRONTEND_BRIEF.md`.
 
 ---
 
+#### QA_BRIEF.md
+
+Save to `.qa/<feature-name>/QA_BRIEF.md` — this is the canonical input for the in-package `qa-flow` (and specifically the `qa-brief-intake` skill that reads it first).
+
+```markdown
+# QA Brief: [Feature/Project Name]
+
+**designMode:** [shadcn-theme | custom-system — from PROJECT_PROFILE.md]
+**testingRigor:** [mvp | full — from PROJECT_PROFILE.md]
+**uiFramework:** [shadcn/ui | <other> | none — from PROJECT_PROFILE.md]
+
+## What we're testing
+[1 paragraph from PRD — the QA perspective: what quality means for this feature, critical user outcomes that must not regress]
+
+## Testing rigor selected
+**testingRigor:** [mvp | full]
+
+Implications:
+- `mvp` → smoke pyramid, 1 E2E per critical journey, covers only FR-XXX marked "must", no formal a11y/perf/visual-regression matrix
+- `full` → complete pyramid, explicit numeric coverage targets, every FR covered plus edge/negative cases, a11y matrix (WCAG AA per component), perf budgets, visual regression
+
+## Functional requirements to test
+[From PRD — list FR-XXX items with priority. In `mvp` mode the must-have set is the minimum scope; in `full` mode all FR-XXX must be covered.]
+
+| FR ID | Priority | Description | Test approach |
+|-------|----------|-------------|---------------|
+| FR-XXX | Must / Should / Nice | [What it does] | Unit / Integration / E2E |
+
+## User journeys to E2E
+[From PRD user journeys — each journey becomes at least one E2E test case in `qa-cases`.]
+
+### Journey 1: [Name]
+1. [Step]
+2. [Step]
+
+### Journey 2: [Name]
+...
+
+## External integrations to test
+[From ARCHITECTURE.md integration table — each external integration needs contract/mock strategy]
+
+| Integration | Purpose | Test approach | Mock strategy |
+|-------------|---------|---------------|---------------|
+| [Service] | [Why] | Contract / Stubbed / Live | [How] |
+
+## Non-functional testing targets
+[Presence depends on testingRigor — in `mvp` only critical NFRs; in `full` the full matrix]
+
+- **Performance:** [e.g., LCP < 2.5s, INP < 200ms, API p95 < 300ms — full mode specifies budgets per route/endpoint]
+- **Accessibility:** [e.g., WCAG AA — full mode specifies matrix per component]
+- **Security:** [Auth coverage, input validation tests, rate limiting tests]
+- **Visual regression:** [full mode only — tool + baselines]
+
+## Test environments and data strategy
+- **Environments:** [local, CI, staging — which runs which tests]
+- **Test data:** [fixtures, seeds, factories, production-like snapshots]
+- **Data isolation:** [per-test teardown, transactional rollback, separate schema]
+- **Secrets handling in tests:** [how auth/API keys are provided in CI]
+
+## Tasks already defined (for reference)
+[From TASKS.md — QA section, if present. If QA_TASKS.md does not yet exist, this will be TBD until `qa-flow` runs.]
+```
+
+---
+
 ### Step 4: Invoke specialist skill-sets
 
 After generating each briefing, invoke the appropriate skill:
@@ -231,11 +302,17 @@ After generating each briefing, invoke the appropriate skill:
 >
 > Run: `frontend-flow`
 
+**QA:**
+> "QA_BRIEF.md is ready at `.qa/<feature-name>/`. Now invoking `qa-flow` — this runs the full QA workflow (qa-brief-intake → qa-strategy → qa-cases → qa-tasks → qa-review)."
+>
+> Run: `qa-flow`
+> `qa-brief-intake` reads QA_BRIEF.md as its primary input and audits existing test infrastructure.
+
 ### Step 5: Coordination note
 
-If all three are running in parallel, remind the user of the sequencing reality:
+If all four are running in parallel, remind the user of the sequencing reality:
 
-> "Design should start first — frontend needs the specs before building components. Backend can run in parallel with design. Frontend waits on both: design specs for the UI, backend endpoints for the API integration. The WORKSTREAMS.md has the full parallel work strategy."
+> "Design should start first — frontend needs the specs before building components. Backend can run in parallel with design. QA can start after PRD + architecture are done (in parallel with design/backend). Frontend waits on both design specs and backend contracts. Once everything is built, design-review, backend-review, frontend-review, and qa-review run in parallel."
 
 ## Rules
 
