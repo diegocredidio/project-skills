@@ -12,11 +12,17 @@ Maps every design spec to a concrete implementation plan. Does NOT write code.
 ### Step 1: Load inputs
 
 Read:
-- `.design/<feature>/COMPONENT_SPECS.md` (visual contract per component — MUST exist)
+- `.pm/<feature>/PROJECT_PROFILE.md` — get `designMode`. MUST exist.
+- `.design/<feature>/COMPONENT_SPECS.md` (visual contract per component — MUST exist). Content shape depends on `designMode`.
 - `.design/<feature>/TOKENS.md` (valid token names to reference)
 - `.frontend/<feature>/FRONTEND_STACK.md` (framework + styling idioms)
 
 If `COMPONENT_SPECS.md` is missing, abort. If `TOKENS.md` is missing, warn — you'll proceed referencing tokens by name as declared in SPECS, but downstream implementation may hit missing variables.
+
+### Step 1.5: Branch on designMode
+
+- **`designMode: custom-system`** → follow Steps 2–6 as written. Plan every primitive, composite, and feature component.
+- **`designMode: shadcn-theme`** → see the **Shadcn-theme mode** section at the end of this skill. In that mode COMPONENT_SPECS is screen-centric: plan the custom variants and roll-your-own components, and emit a `shadcn add` list for primitives instead of re-planning them.
 
 ### Step 2: Enumerate components to plan
 
@@ -192,3 +198,90 @@ Tell the user: "Component plans recorded for [N] components ([M] primitives, [K]
 - Never hardcode colors/spacing — every visual rule references a token by name.
 - When building on Radix / shadcn, declare which primitives you wrap. This is the contract for `frontend-tasks` and for `design-review` to verify.
 - Missing specs or missing tokens are blockers — surface them, don't invent fills.
+- Read `.pm/<feature>/PROJECT_PROFILE.md` at Step 1. If `designMode: shadcn-theme`, use the Shadcn-theme mode section — emit `npx shadcn add` commands instead of per-primitive plans.
+
+---
+
+## Shadcn-theme mode
+
+Use when `PROJECT_PROFILE.md` has `designMode: shadcn-theme`. COMPONENT_SPECS lists shadcn inventory + custom variants + roll-your-own + screens.
+
+### What to produce in COMPONENT_PLAN.md
+
+1. **Shadcn install plan** — one `npx shadcn add <component>` per row of the shadcn inventory. No per-primitive spec (shadcn ships the contract).
+2. **Custom variants** — for each custom variant, plan the CVA extension file path (e.g., `components/ui/button.tsx` already exists — we extend its `variants.variant` map). Include the exact CVA diff from COMPONENT_SPECS.
+3. **Roll-your-own components** — planned exactly like current Step 3 (target file path, props, state, data deps, token usage, a11y, responsive, test plan).
+4. **Screen implementation order** — topological order of screens from COMPONENT_SPECS, each listing what shadcn needs to be installed first and what custom/roll-your-own components it depends on.
+
+### What to skip
+
+- Per-primitive plans for shadcn-provided components (Button, Input, Card, Dialog, etc.).
+- Token maps per primitive — implicit via shadcn CSS vars.
+
+### Write COMPONENT_PLAN.md (shadcn-theme shape)
+
+Save to `.frontend/<feature>/COMPONENT_PLAN.md`:
+
+`````markdown
+# Component Plan: [Feature Name] (shadcn-theme mode)
+
+## Shadcn install plan
+
+```bash
+npx shadcn add button
+npx shadcn add card
+npx shadcn add dialog
+npx shadcn add form
+npx shadcn add input
+# ... one per row of inventory in COMPONENT_SPECS
+```
+
+## Custom variants
+
+### Button — `ghost-destructive`
+- **File:** `components/ui/button.tsx` (edit after `npx shadcn add button`)
+- **Change:** add variant entry to the `buttonVariants` CVA config
+- **CVA diff:**
+  ```ts
+  variants: {
+    variant: {
+      // ...existing variants from shadcn default
+      'ghost-destructive': 'text-destructive hover:bg-destructive/10',
+    }
+  }
+  ```
+- **Test:** unit (RTL) — render Button with variant + assert classname includes `text-destructive`.
+
+## Roll-your-own components
+
+### ProjectCard
+- **File:** `components/feature/project-card.tsx`
+- **Exported:** `ProjectCard` (named)
+- **Props:**
+  ```ts
+  interface ProjectCardProps {
+    project: Project;
+    onOpen: () => void;
+  }
+  ```
+- **Internal state:** none (presentational)
+- **Data deps:** none (parent passes `project`)
+- **Token usage:** via shadcn vars only — `bg-card`, `text-card-foreground`, `border`, `hover:bg-accent`
+- **A11y:** root `<article>` + heading `<h3>` for project name; whole card focusable via keyboard (tabindex 0, onKeyDown for Enter/Space)
+- **Responsive:** stacks vertically < `md`; side-by-side >= `md`
+- **Test:** unit (RTL) — render + click + keyboard activation; integration — inside ProjectGrid
+
+## Screen implementation order
+
+1. Install shadcn Button, Card, Input — needed everywhere
+2. Implement roll-your-own ProjectCard — depends on shadcn Card, Badge, Avatar
+3. Implement SidebarLayout — depends on shadcn Sidebar, Breadcrumb
+4. Screen: Dashboard — depends on SidebarLayout + ProjectCard
+5. Install shadcn Form, Label, Separator
+6. Implement CenteredCardLayout
+7. Screen: Login — depends on CenteredCardLayout + shadcn Form
+`````
+
+### Hand off
+
+"Plan de componentes em modo shadcn-theme pronto. `frontend-tasks` vai transformar em slices verticais — primeira slice normalmente é 'scaffold + install shadcn base'."
