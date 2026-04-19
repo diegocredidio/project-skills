@@ -42,7 +42,7 @@ Look for `.qa/<feature>/QA_BRIEF.md`. If absent, fall back to `.pm/<feature>/PRD
 
 For each step:
 
-1. Announce: "**Step N/5: [skill name]** — [one-line description]"
+1. Announce: "**Step N/4: [skill name]** — [one-line description]"
 2. Invoke the skill
 3. Save output to `.qa/<feature>/`
 4. Summarize what was produced
