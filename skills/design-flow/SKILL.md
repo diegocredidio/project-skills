@@ -38,6 +38,16 @@ Ask: "Which feature are we designing?" Use a kebab-case slug. If invoked by pm-h
 
 If `.design/<feature>/` exists with prior artifacts, show what's present and ask: "Continue where we left off, or start fresh?"
 
+### Step 1.5: Read the project profile
+
+Read `.pm/<feature>/PROJECT_PROFILE.md` to get `designMode`. If the file is missing:
+
+> "Este projeto não tem PROJECT_PROFILE.md. Modo de design: **shadcn-theme** ou **custom-system**?"
+
+Write the file with the answer. Then announce the mode to the user:
+
+> "Rodando design-flow em modo **<designMode>**. `design-tokens` e `design-components` vão se ajustar a esse modo."
+
 ### Step 2: Pick the entry path
 
 Check for `.design/<feature>/DESIGN_BRIEF.md`:
@@ -103,3 +113,4 @@ When the user returns with "run design-review" or similar:
 - Respect the user's existing codebase — `design-brief-intake` runs a codebase audit and later skills honor the `CODEBASE_AUDIT.md` findings (existing tokens, existing components).
 - On Path A, never re-ask decisions already resolved in the pm-handoff brief.
 - `design-review` is terminal and may loop back to earlier skills only on user request (e.g., "redo tokens based on the review").
+- Always read `.pm/<feature>/PROJECT_PROFILE.md` at Step 1.5. Sub-skills rely on the mode being explicit.
