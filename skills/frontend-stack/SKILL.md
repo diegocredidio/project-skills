@@ -13,6 +13,8 @@ Locks every frontend technology and pattern choice.
 
 Read `.frontend/<feature>/FRONTEND_INTAKE.md`. If missing, direct user to run `frontend-brief-intake` first.
 
+Read `.pm/<feature>/PROJECT_PROFILE.md` to get `designMode` and `uiFramework`. If missing, prompt the user once and create it (same migration prompt used by `pm-handoff` and `design-flow`).
+
 Also read `.design/<feature>/TOKENS.md` if present — it constrains styling choices.
 
 ### Step 2: Fill the 8-row decision table
@@ -30,6 +32,16 @@ Also read `.design/<feature>/TOKENS.md` if present — it constrains styling cho
 | Hosting | Vercel / Cloudflare Pages / Netlify / static + CDN | Vercel |
 
 Every row needs rationale pointing to intake or design constraints.
+
+### Step 2.5: Profile conflict check
+
+Cross-check the Component library row against `PROJECT_PROFILE.md`:
+
+- If `designMode: shadcn-theme` AND Component library ≠ `shadcn/ui` (customized) → **abort**:
+
+  > "Conflito: PROJECT_PROFILE diz `shadcn-theme` mas você escolheu `[X]` como Component library. Reconcile antes de continuar: ou troque o Component library para `shadcn/ui`, ou edite `.pm/<feature>/PROJECT_PROFILE.md` para `designMode: custom-system`."
+
+- If `designMode: custom-system` AND Component library = `shadcn/ui` → proceed, but note in the decision log that shadcn is being used as a primitive base under a custom token system (valid, just explicit).
 
 ### Step 3: Coding conventions
 
