@@ -54,7 +54,7 @@ If yes, ask those too. If no, close the grill.
 
 ### Step A4: Produce the grill summary
 
-Write `.pm/<feature-name>/GRILL_SUMMARY.md` with ALL resolved information — both what came from the original document (already clear) and what was resolved in the grill.
+Write `.pm/<feature-name>/GRILL_SUMMARY.md` with ALL resolved information — both what came from the original document (already clear) and what was resolved in the grill. Also write `.pm/<feature-name>/PROJECT_PROFILE.md` per the "Project Profile" section below.
 
 ---
 
@@ -87,6 +87,7 @@ Before asking anything, identify the main branches that need resolution. Present
 - Scale: How many users? How much data? Growth trajectory?
 - Constraints: Compliance? Accessibility? Performance? Budget?
 - Existing codebase: What already exists that we need to respect or integrate with?
+- Delivery profile: Design mode — `shadcn-theme` (MVP, designer delivers shadcn theme + screen specs) or `custom-system` (full design system, tokens + primitives from scratch)? UI framework — `shadcn/ui`, other, or none?
 
 **Organizational branches:**
 - Team: Who's building? What skills are available?
@@ -167,6 +168,22 @@ Write `.pm/<feature-name>/GRILL_SUMMARY.md`:
 |----------|--------|-----------|
 | [Decision] | [What was decided] | [Why] |
 ```
+
+---
+
+## Project Profile (both modes)
+
+When the Delivery profile branch is resolved, ALSO write `.pm/<feature-name>/PROJECT_PROFILE.md` — a minimal, machine-readable record that downstream skills (`pm-handoff`, `design-flow`, `design-tokens`, `design-components`, `frontend-stack`, `frontend-components`) read with a simple grep. Separate file from `GRILL_SUMMARY.md` so it survives re-runs of the grill.
+
+Format:
+
+```markdown
+# Project Profile
+designMode: shadcn-theme | custom-system
+uiFramework: shadcn/ui | <other> | none
+```
+
+If the user didn't resolve the Delivery profile branch (gap-fill mode where the source doc pre-answered it), still write the file using the inferred values and cite the source in the GRILL_SUMMARY Key Decisions table.
 
 ## Rules
 
