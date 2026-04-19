@@ -12,10 +12,16 @@ Produces the canonical contract for every UI component, consumed by `frontend-co
 ### Step 1: Load inputs
 
 Read:
+- `.pm/<feature>/PROJECT_PROFILE.md` — get `designMode`. MUST exist. Branch behavior at Step 1.5.
 - `.design/<feature>/DESIGN_BRIEF.md` (component inventory draft)
 - `.design/<feature>/IA.md` (routes and reuse map)
 - `.design/<feature>/TOKENS.md` (all values components may reference)
 - `.design/<feature>/CODEBASE_AUDIT.md` (existing components)
+
+### Step 1.5: Branch on designMode
+
+- **`designMode: custom-system`** → follow Steps 2–the rest as written. Specs every primitive and composite in full. Output file: `.design/<feature>/COMPONENT_SPECS.md`.
+- **`designMode: shadcn-theme`** → follow the **Shadcn-theme mode** section at the end of this skill. Output file: `.design/<feature>/COMPONENT_SPECS.md` (same filename, different content shape — screen-centric).
 
 ### Step 2: Build the canonical component list
 
@@ -192,3 +198,94 @@ Tell the user: "Specs recorded for [N modify + M new] components. Next: `design-
 - Reference tokens by name (`bg-accent-hover`), never raw hex/rgb values.
 - Mark status explicitly — `frontend-components` skips components with status `reuse`.
 - Don't include implementation code. The contract is enough; `frontend-components` does the code mapping.
+- Read `.pm/<feature>/PROJECT_PROFILE.md` at Step 1. If `designMode: shadcn-theme`, use the Shadcn-theme mode section at the end of this skill — screen-centric output, no primitive specs.
+
+---
+
+## Shadcn-theme mode
+
+Use when `PROJECT_PROFILE.md` has `designMode: shadcn-theme`. The designer is designing screens and choosing shadcn components — NOT specifying primitives (shadcn is the contract for Button, Input, Dialog, etc.).
+
+### What to produce
+
+1. **Shadcn inventory** — per-feature list of shadcn components used and any customizations.
+2. **Custom variants** — shadcn components that need a new variant (document the CVA diff).
+3. **Roll-your-own components** — anything shadcn doesn't cover, specced as usual.
+4. **Screen specs** — per screen: layout, shadcn pieces, custom components, and states (default, loading, empty, error, success).
+
+### What to skip
+
+- Primitive specs (Button, Input, Checkbox, etc.) — shadcn provides these.
+- Token-per-component tables — implicit via shadcn CSS vars.
+
+### Write COMPONENT_SPECS.md (shadcn-theme shape)
+
+Save to `.design/<feature>/COMPONENT_SPECS.md`:
+
+````markdown
+# Component Specs: [Feature Name] (shadcn-theme mode)
+
+## Mode
+shadcn-theme — primitives come from the shadcn catalog. This doc covers
+screens, compositions, custom variants, and roll-your-own components.
+
+## Shadcn component inventory (used in this feature)
+
+| Component | Source | Customization |
+|-----------|--------|---------------|
+| Button    | shadcn | default variants only |
+| Card      | shadcn | default |
+| Dialog    | shadcn | `size=lg` variant added |
+| ... | ... | ... |
+
+## Custom variants
+
+### Button — variant `ghost-destructive`
+- **Use:** secondary destructive actions (e.g., "Remove" inside a card)
+- **Base:** shadcn Button `ghost`
+- **Overrides:** text uses `--destructive`, hover bg `--destructive/10`
+- **CVA diff:**
+  ```ts
+  variants: {
+    variant: {
+      // ...existing shadcn variants
+      'ghost-destructive': 'text-destructive hover:bg-destructive/10',
+    }
+  }
+  ```
+
+## Roll-your-own components
+
+### ProjectCard
+- **Composition:** Card (shadcn) + Badge (shadcn) + Avatar (shadcn) + custom layout
+- **Props:**
+  ```ts
+  interface ProjectCardProps {
+    project: Project;
+    onOpen: () => void;
+  }
+  ```
+- **States:** default, hover, loading (Skeleton), empty (no-cover fallback)
+
+## Screen specs
+
+### Screen: Dashboard (/dashboard)
+- **Layout:** SidebarLayout (roll-your-own) > PageHeader + ProjectGrid
+- **Shadcn pieces:** Sidebar, Breadcrumb, Input (search), Button, Card
+- **Custom:** ProjectCard, EmptyState illustration
+- **States:**
+  - Default: 3-column grid of ProjectCards
+  - Loading: 6× Skeleton cards
+  - Empty: EmptyState with "Create your first project" CTA
+  - Error: Alert (shadcn, variant destructive) + retry Button
+
+### Screen: Login (/login)
+- **Layout:** CenteredCardLayout
+- **Shadcn pieces:** Card, Form, Input, Button, Label, Separator
+- **Custom:** none
+- **States:** default, submitting (Button loading), error (FormMessage per field)
+````
+
+### Hand off
+
+"Specs de componentes prontas em modo shadcn-theme. Próximo: `design-tasks` (slices verticais) → `frontend-flow` vai consumir este COMPONENT_SPECS e rodar `npx shadcn add <componente>` para cada item do inventário."
