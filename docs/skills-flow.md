@@ -1,6 +1,6 @@
 # Skills flow
 
-All 35 skills, their artifacts, and the cross-cutting `PROJECT_PROFILE.md` contract rendered as mermaid diagrams. For a terminal-friendly ASCII view, see the main `README.md`.
+All 41 skills, their artifacts, and the cross-cutting `PROJECT_PROFILE.md` contract rendered as mermaid diagrams. For a terminal-friendly ASCII view, see the main `README.md`.
 
 ---
 
@@ -12,18 +12,22 @@ flowchart TD
     PM -->|pm-handoff| Design[design-flow]
     PM -->|pm-handoff| Backend[backend-flow]
     PM -->|pm-handoff| Frontend[frontend-flow]
+    PM -->|pm-handoff| QA[qa-flow]
     Design -.specs upstream.-> Frontend
     Backend -.API contracts.-> Frontend
     Design --> Build1[implementação]
     Backend --> Build2[implementação]
     Frontend --> Build3[implementação]
+    QA --> Build4[implementação]
     Build1 --> DReview[design-review]
     Build2 --> BReview[backend-review]
     Build3 --> FReview[frontend-review]
+    Build4 --> QReview[qa-review]
     PM -.TASKS.md.-> Kanban[kanban-flow]
     Design -.DESIGN_TASKS.md.-> Kanban
     Backend -.BACKEND_TASKS.md.-> Kanban
     Frontend -.FRONTEND_TASKS.md.-> Kanban
+    QA -.QA_TASKS.md.-> Kanban
 ```
 
 ---
@@ -40,11 +44,12 @@ flowchart LR
     WS --> Tasks[pm-tasks]
     Tasks --> Review[pm-review]
     Review --> Handoff[pm-handoff]
-    Grill -.escreve.-> PP[("PROJECT_PROFILE.md<br/>designMode + uiFramework")]
+    Grill -.escreve.-> PP[("PROJECT_PROFILE.md<br/>designMode + uiFramework + testingRigor")]
     Handoff -.lê.-> PP
     Handoff --> DesignFlow[design-flow]
     Handoff --> BackendFlow[backend-flow]
     Handoff --> FrontendFlow[frontend-flow]
+    Handoff --> QAFlow[qa-flow]
 ```
 
 ---
@@ -103,6 +108,27 @@ flowchart TD
 
 ---
 
+## QA flow (com testingRigor branching)
+
+```mermaid
+flowchart TD
+    Flow["qa-flow<br/>lê PROJECT_PROFILE.md<br/>(prompt migração se faltar)"] --> Brief[qa-brief-intake]
+    Brief --> Strategy[qa-strategy]
+    Strategy --> Mode{testingRigor?}
+    Mode -->|mvp| StratSlim["qa-strategy<br/>smoke pyramid<br/>unit crítico + 1 E2E por user journey<br/>apenas FR-XXX must"]
+    Mode -->|full| StratFull["qa-strategy<br/>full pyramid<br/>coverage targets (80% lines / 70% branches)<br/>todos FR-XXX"]
+    StratSlim --> Cases[qa-cases]
+    StratFull --> Cases
+    Cases --> QTasks[qa-tasks]
+    QTasks --> Build[build]
+    Build --> Review[qa-review]
+    Review --> RMode{testingRigor?}
+    RMode -->|mvp| RSlim["qa-review<br/>smoke report<br/>(sem visual regression / a11y matrix / perf budget)"]
+    RMode -->|full| RFull["qa-review<br/>matrix + coverage + visual regression<br/>+ a11y matrix + perf budget"]
+```
+
+---
+
 ## Kanban flow
 
 ```mermaid
@@ -123,20 +149,23 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    PG[pm-grill] -->|escreve| PP[("PROJECT_PROFILE.md<br/>designMode<br/>uiFramework")]
+    PG[pm-grill] -->|escreve| PP[("PROJECT_PROFILE.md<br/>designMode<br/>uiFramework<br/>testingRigor")]
     PI[pm-intake] -.detecta gap se<br/>UI framework ausente.-> PG
     PP -->|lê| PH[pm-handoff]
+    PP -->|lê| PA[pm-architecture]
     PP -->|lê| DF[design-flow]
     PP -->|lê| DT[design-tokens]
     PP -->|lê| DC[design-components]
     PP -->|lê| FS[frontend-stack]
     PP -->|lê| FC[frontend-components]
+    PP -->|lê| QS[qa-strategy]
+    PP -->|lê| QR[qa-review]
     PH -.fallback prompt.-> PP
     DF -.fallback prompt.-> PP
     FS -.fallback prompt.-> PP
 ```
 
-Projetos legados sem o arquivo: qualquer um dos três pontos (`pm-handoff`, `design-flow`, `frontend-stack`) pergunta uma vez e grava — sem re-rodar `pm-grill`.
+Projetos legados sem o arquivo: os três pontos de fallback-prompt (`pm-handoff`, `design-flow`, `frontend-stack`) perguntam uma vez e gravam — sem re-rodar `pm-grill`. Leitores downstream (`pm-architecture`, `design-tokens`, `design-components`, `frontend-components`, `qa-strategy`, `qa-review`) apenas consomem os valores já gravados.
 
 ---
 
@@ -148,6 +177,7 @@ Projetos legados sem o arquivo: qualquer um dos três pontos (`pm-handoff`, `des
 | Design | `.design/<feature>/` | `DESIGN_GRILL.md` (Path B), `DESIGN_BRIEF.md`, `CODEBASE_AUDIT.md`, `IA.md`, `TOKENS.md` (slim ou full conforme modo), `COMPONENT_SPECS.md` (screen-centric ou full conforme modo), `DESIGN_TASKS.md`, `DESIGN_REVIEW.md`, `screenshots/` |
 | Backend | `.backend/<feature>/` | `BACKEND_BRIEF.md`, `BACKEND_INTAKE.md`, `BACKEND_STACK.md`, `BACKEND_DATA.md`, `BACKEND_API.md`, `BACKEND_TASKS.md`, `BACKEND_REVIEW.md` |
 | Frontend | `.frontend/<feature>/` | `FRONTEND_BRIEF.md`, `FRONTEND_INTAKE.md`, `FRONTEND_STACK.md`, `FRONTEND_ROUTES.md`, `COMPONENT_PLAN.md`, `FRONTEND_TASKS.md`, `FRONTEND_REVIEW.md` |
+| QA | `.qa/<feature>/` | `QA_BRIEF.md`, `QA_INTAKE.md`, `QA_STRATEGY.md` (slim ou full conforme `testingRigor`), `TEST_CASES.md` (scoped por `testingRigor`), `QA_TASKS.md`, `QA_REVIEW.md` (slim ou full conforme `testingRigor`) |
 | Kanban | `.pm/` | `jira-config.md` (global, first-run) |
 
 Todos são markdown plano — editáveis à mão, versionáveis, diffáveis. Re-rodar uma skill atualiza seu arquivo; artefatos downstream se adaptam na próxima execução.

@@ -1,6 +1,6 @@
 # project-skills
 
-**35 skills for Claude Code that take a project from a vague idea to a Jira-backed implementation plan across PM, design, backend, and frontend — with room to re-run any one phase when a decision changes.**
+**41 skills for Claude Code that take a project from a vague idea to a Jira-backed implementation plan across PM, design, backend, frontend, and QA — with room to re-run any one phase when a decision changes.**
 
 Inspired by [Julian Oczkowski's designer-skills](https://github.com/julianoczkowski/designer-skills) and [Matt Pocock's skills](https://github.com/mattpocock/skills) — rewritten from scratch, no external runtime dependencies.
 
@@ -8,41 +8,52 @@ Inspired by [Julian Oczkowski's designer-skills](https://github.com/julianoczkow
 
 ## What this gives you
 
-Five families of skills, each a re-invocable piece of a larger flow:
+Six families of skills (pm-flow, design-flow, backend-flow, frontend-flow, qa-flow, kanban-flow), each a re-invocable piece of a larger flow:
 
 ```
 pm-flow
   pm-intake? → pm-grill → pm-prd → pm-architecture
   → pm-workstreams → pm-tasks → pm-review → pm-handoff
                                                ↓
-      ┌────────────────────┬───────────────────┴────────────────┐
-      ↓                    ↓                                    ↓
- design-flow         backend-flow                        frontend-flow
- (Path A direct)                                  (depends on design outputs)
-      ↓                    ↓                                    ↓
- design-brief-intake  backend-brief-intake               frontend-brief-intake
-      ↓                    ↓                                    ↓
- design-ia           backend-stack                        frontend-stack
-      ↓                    ↓                                    ↓
- design-tokens       backend-data                         frontend-routing
-      ↓                    ↓                                    ↓
- design-components   backend-api                          frontend-components
-      ↓                    ↓                                    ↓
- design-tasks        backend-tasks                        frontend-tasks
-      ↓                    ↓                                    ↓
- (build)             (build)                              (build)
-      ↓                    ↓                                    ↓
- design-review       backend-review                        frontend-review
+      ┌────────────────────┬────────────────┬──┴──────────────────┐
+      ↓                    ↓                ↓                     ↓
+ design-flow         backend-flow     frontend-flow           qa-flow
+ (Path A direct)                      (depends on design)     (parallel to build)
+      ↓                    ↓                ↓                     ↓
+ design-brief-intake  backend-brief-intake  frontend-brief-intake qa-brief-intake
+      ↓                    ↓                ↓                     ↓
+ design-ia           backend-stack     frontend-stack          qa-strategy
+      ↓                    ↓                ↓                     ↓
+ design-tokens       backend-data      frontend-routing        qa-cases
+      ↓                    ↓                ↓                     ↓
+ design-components   backend-api       frontend-components     qa-tasks
+      ↓                    ↓                ↓                     ↓
+ design-tasks        backend-tasks     frontend-tasks          (build)
+      ↓                    ↓                ↓                     ↓
+ (build)             (build)           (build)                 qa-review
+      ↓                    ↓                ↓
+ design-review       backend-review    frontend-review
 ```
 
-### Design modes
+### Project profile
 
-`pm-grill` asks early which mode you're in — the answer branches `design-tokens` and `design-components` behavior, and `frontend-components` follows suit:
+`pm-grill` asks early about two dimensions — the answers live in `.pm/<feature>/PROJECT_PROFILE.md` and are read by nine downstream skills (`pm-handoff`, `pm-architecture`, `design-flow`, `design-tokens`, `design-components`, `frontend-stack`, `frontend-components`, `qa-strategy`, `qa-review`).
+
+#### Design mode
+
+Branches `design-tokens`, `design-components`, and `frontend-components` behavior:
 
 - **`shadcn-theme`** (MVP with shadcn/ui) — designer delivers a slim theme (HSL CSS vars + radius + font, via [tweakcn](https://tweakcn.com) or a shadcn preset) + screen-centric specs (shadcn component inventory, custom variants, roll-your-own). `frontend-components` emits `npx shadcn add` plans instead of per-primitive specs.
 - **`custom-system`** — full token architecture (spacing, typography, motion, z-index) + primitive specs from scratch.
 
-The choice lives in `.pm/<feature>/PROJECT_PROFILE.md` and is read by six downstream skills (`pm-handoff`, `design-flow`, `design-tokens`, `design-components`, `frontend-stack`, `frontend-components`). `frontend-stack` aborts on conflicts (e.g., `shadcn-theme` + non-shadcn component library).
+`frontend-stack` aborts on conflicts (e.g., `shadcn-theme` + non-shadcn component library).
+
+#### Testing rigor
+
+Branches `qa-strategy`, `qa-cases`, and `qa-review` depth:
+
+- **`mvp`** — smoke pyramid (unit where critical, 1 E2E per user journey), covers only FR-XXX marked "must". `qa-review` skips visual regression, a11y matrix, and perf budget.
+- **`full`** — full pyramid with explicit coverage targets (e.g., 80% lines / 70% branches), all FR-XXX covered. `qa-review` runs visual regression, a11y matrix, and perf budget.
 
 See [`docs/skills-flow.md`](docs/skills-flow.md) for the full mermaid-rendered flow map (including branching).
 
@@ -86,7 +97,7 @@ Every skill reads from and writes to `.<discipline>/<feature>/` in the target re
 .pm/<feature>/
   ├── INTAKE.md              (pm-intake)
   ├── GRILL_SUMMARY.md       (pm-grill)
-  ├── PROJECT_PROFILE.md     (pm-grill — designMode + uiFramework; read by 6 downstream skills)
+  ├── PROJECT_PROFILE.md     (pm-grill — designMode + uiFramework + testingRigor; read by 9 downstream skills)
   ├── PRD.md                 (pm-prd)
   ├── ARCHITECTURE.md        (pm-architecture)
   ├── WORKSTREAMS.md         (pm-workstreams)
@@ -123,6 +134,14 @@ Every skill reads from and writes to `.<discipline>/<feature>/` in the target re
   ├── FRONTEND_TASKS.md      (frontend-tasks)
   └── FRONTEND_REVIEW.md     (frontend-review)
 
+.qa/<feature>/
+  ├── QA_BRIEF.md            (pm-handoff)
+  ├── QA_INTAKE.md           (qa-brief-intake)
+  ├── QA_STRATEGY.md         (qa-strategy — slim in mvp, full in full)
+  ├── TEST_CASES.md          (qa-cases — scoped by testingRigor)
+  ├── QA_TASKS.md            (qa-tasks)
+  └── QA_REVIEW.md           (qa-review — slim in mvp, full in full)
+
 .pm/jira-config.md            (kanban-flow, first-run setup)
 ```
 
@@ -155,10 +174,10 @@ All state lives on disk under `.<discipline>/<feature>/`. Resume across sessions
 If you use the [superpowers](https://github.com/obra/superpowers) skill pack, these are complementary, not competing:
 
 - `superpowers:brainstorming` — for **open-ended ideation**, before a scope exists. Use this first when you have a fuzzy idea.
-- `superpowers:writing-plans` — for **generic multi-step task authoring**, when the work is small and doesn't need the full PM/Design/Backend/Frontend ladder.
+- `superpowers:writing-plans` — for **generic multi-step task authoring**, when the work is small and doesn't need the full PM/Design/Backend/Frontend/QA ladder.
 - `superpowers:executing-plans` — for executing an existing plan with review checkpoints.
 - **`project-skills:pm-flow`** — fills the gap between brainstorming and plan execution for **named projects or features** with a real PRD / architecture / workstream decomposition.
-- **`project-skills:design-flow`, `backend-flow`, `frontend-flow`** — discipline-specific decomposition when a project has artifacts ready to hand off.
+- **`project-skills:design-flow`, `backend-flow`, `frontend-flow`, `qa-flow`** — discipline-specific decomposition when a project has artifacts ready to hand off.
 - **`project-skills:kanban-*`** — project management layer once the plan exists.
 
 Every skill in this pack has an anti-collision clause in its description: if the subject is "open-ended", `superpowers:brainstorming` wins. If the subject is "plan this named feature end-to-end", `project-skills:pm-flow` wins.
