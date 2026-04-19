@@ -67,7 +67,7 @@ Do not work around a missing dependency. A blocked QA slice stays blocked and vi
 
 Save to `.qa/<feature>/QA_TASKS.md`:
 
-```markdown
+````markdown
 # QA Tasks: [Feature Name]
 
 **Strategy:** .qa/<feature>/QA_STRATEGY.md
@@ -183,7 +183,7 @@ Cross-discipline dependencies:
 ## Parallelizable
 
 - 002 ∥ 003 ∥ 006 (different case groups, independent fixtures)
-```
+````
 
 ### Step 7: Hand off
 
