@@ -136,7 +136,21 @@ From BACKEND_DATA.md:
 Say "start" and I'll begin scaffolding. Or ask any question about the spec.
 ```
 
-### Step 8: Hand off to the user's own workflow
+### Step 8: Suggest matching agent
+
+If `.claude/agents/<feature>/` exists in the repo, inspect the task's discipline (from the Jira issue labels: backend / frontend / qa / design) and surface a suggestion:
+
+> "Task picked: [TASK_ID]. If you haven't already, invoke the feature's specialized agent to implement:
+>
+> `@<feature>-<discipline>-engineer`
+>
+> It has the stack, conventions, and data model preloaded from the planning artifacts."
+
+Discipline mapping: `backend` → `backend-engineer`, `frontend` → `frontend-engineer`, `qa` → `qa-engineer`, `design` → `design-reviewer`.
+
+Skip this step if `.claude/agents/<feature>/` doesn't exist (dev didn't run `cc-flow`).
+
+### Step 9: Hand off to the user's own workflow
 
 After context is loaded, this skill is done. The user drives implementation from here (possibly invoking other skills or writing code directly).
 
