@@ -1,0 +1,14 @@
+## Testing approach: Full
+
+This project uses **full** testing rigor — a complete pyramid with explicit coverage targets, all functional requirements covered, and quality gates at every layer.
+
+Coverage targets for this project are defined in {{artifactPaths.qaStrategy}}. Adhere to them strictly; do not merge a task that drops coverage below the defined thresholds. Every functional requirement in the PRD (must and should) maps to at least one test case in {{artifactPaths.testCases}} — if a test case is missing, add it before implementing the feature.
+
+The pyramid layers are: unit (pure logic, isolated functions), integration (service + DB or API + service interactions), and end-to-end (full user journeys via the browser). Each layer has a designated tool — see {{artifactPaths.qaStrategy}} for the specific tools and their configuration.
+
+In addition to functional tests, this project runs:
+- **Visual regression**: screenshot comparison on key components after each change.
+- **Accessibility matrix**: automated WCAG AA checks (axe-core or equivalent) on all routes.
+- **Performance budget**: Lighthouse or equivalent CI check; failing the budget blocks merge.
+
+See {{artifactPaths.qaStrategy}} for the specific thresholds and CI configuration for each gate.
