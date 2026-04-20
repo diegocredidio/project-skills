@@ -7,10 +7,7 @@
   "plugins": [
     {
       "name": "project-skills",
-      "source": {
-        "source": "github",
-        "repo": "diegocredidio/project-skills"
-      },
+      "source": "./",
       "description": "PM planning pipeline + design system workflow + backend/frontend decomposition + Kanban sync to Jira.",
       "version": "1.0.0",
       "category": "planning",
