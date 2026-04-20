@@ -1,7 +1,7 @@
 {
   "name": "project-skills",
-  "version": "1.0.0",
-  "description": "PM + Design + Backend + Frontend + Kanban skill-set for Claude Code: from vague idea to structured artifacts across all disciplines, with Jira sync.",
+  "version": "1.2.0",
+  "description": "PM + Design + Backend + Frontend + Kanban + Claude Code guardrails skill-set: from vague idea to structured artifacts across all disciplines, with Jira sync and per-feature Claude Code agents.",
   "author": {
     "name": "Diego Credidio",
     "url": "https://github.com/diegocredidio"
@@ -17,6 +17,7 @@
     "backend",
     "frontend",
     "kanban",
-    "jira"
+    "jira",
+    "claude-code-guardrails"
   ]
 }

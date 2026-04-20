@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] — 2026-04-20
+
+### Added
+
+- `cc-flow` and `cc-sync` skills — compile planning artifacts into per-feature Claude Code agents in `.claude/agents/<feature>/`. Setup mode copies starter templates; cycle mode renders agents idempotently via manifest + checksum-prompt policy.
+- Starter templates in `templates/` (5 agent templates + 4 partials): `backend-engineer`, `frontend-engineer`, `qa-engineer`, `product-architect`, `design-reviewer`; partials `testing-rigor-mvp`, `testing-rigor-full`, `shadcn-theme-notes`, `custom-system-notes`.
+- `docs/guardrails.md` — end-to-end explainer: what cc-flow generates, why, the flow, checksum-prompt policy, manifest anatomy, archive lifecycle, FAQ.
+- `testingRigor`-aware and `designMode`-aware partial selection in cc-sync.
+
+### Changed
+
+- `pm-handoff` gains a 5th workstream option "CC Guardrails" to bootstrap Claude Code agents via `cc-flow`.
+- `kanban-pickup` suggests the per-feature agent (`@<feature>-<discipline>-engineer`) when `.claude/agents/<feature>/` exists after task pickup.
+- README: skill count 41 → 43, new "Claude Code guardrails" family, seven families total, cc-flow in ASCII flow diagram, new artifacts section, new "Guardrails as output" principle.
+- `docs/skills-flow.md`: new CC flow mermaid diagram, cc-sync added to PROJECT_PROFILE.md reader map, CC rows added to artifacts table, 41 → 43 in intro.
+
 ## [1.0.0] — 2026-04-17
 
 Initial release. 35 skills across five disciplines:

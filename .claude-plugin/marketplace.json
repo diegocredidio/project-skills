@@ -8,10 +8,10 @@
     {
       "name": "project-skills",
       "source": "./",
-      "description": "PM planning pipeline + design system workflow + backend/frontend decomposition + Kanban sync to Jira.",
-      "version": "1.0.0",
+      "description": "PM planning pipeline + design system workflow + backend/frontend decomposition + Kanban sync to Jira + Claude Code guardrails generation.",
+      "version": "1.2.0",
       "category": "planning",
-      "tags": ["pm", "planning", "prd", "design", "backend", "frontend", "kanban"]
+      "tags": ["pm", "planning", "prd", "design", "backend", "frontend", "kanban", "claude-code-guardrails"]
     }
   ]
 }
