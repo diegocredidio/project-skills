@@ -1,6 +1,6 @@
 # project-skills
 
-**41 skills for Claude Code that take a project from a vague idea to a Jira-backed implementation plan across PM, design, backend, frontend, and QA — with room to re-run any one phase when a decision changes.**
+**43 skills for Claude Code that take a project from a vague idea to a Jira-backed implementation plan across PM, design, backend, frontend, QA, and Claude Code guardrails — with room to re-run any one phase when a decision changes.**
 
 Inspired by [Julian Oczkowski's designer-skills](https://github.com/julianoczkowski/designer-skills) and [Matt Pocock's skills](https://github.com/mattpocock/skills) — rewritten from scratch, no external runtime dependencies.
 
@@ -8,7 +8,7 @@ Inspired by [Julian Oczkowski's designer-skills](https://github.com/julianoczkow
 
 ## What this gives you
 
-Six families of skills (pm-flow, design-flow, backend-flow, frontend-flow, qa-flow, kanban-flow), each a re-invocable piece of a larger flow:
+Seven families of skills (pm-flow, design-flow, backend-flow, frontend-flow, qa-flow, kanban-flow, cc-flow), each a re-invocable piece of a larger flow:
 
 ```
 pm-flow
@@ -33,6 +33,10 @@ pm-flow
  (build)             (build)           (build)                 qa-review
       ↓                    ↓                ↓
  design-review       backend-review    frontend-review
+                                               ↓
+                                    cc-flow (optional — bootstraps .claude/agents/<feature>/)
+                                               ↓
+                                            cc-sync
 ```
 
 ### Project profile
@@ -56,6 +60,8 @@ Branches `qa-strategy`, `qa-cases`, and `qa-review` depth:
 - **`full`** — full pyramid with explicit coverage targets (e.g., 80% lines / 70% branches), all FR-XXX covered. `qa-review` runs visual regression, a11y matrix, and perf budget.
 
 See [`docs/skills-flow.md`](docs/skills-flow.md) for the full mermaid-rendered flow map (including branching).
+
+`cc-flow` reads `PROJECT_PROFILE.md` (`designMode` and `testingRigor`) to select the right partials when rendering agent templates — the same profile values that branch design and QA flows also shape the generated Claude Code guardrails. See [`docs/guardrails.md`](docs/guardrails.md) for the full cc-flow explainer.
 
 Then, whenever you're ready to put the plan on a board:
 
@@ -154,6 +160,31 @@ Every skill reads from and writes to `.<discipline>/<feature>/` in the target re
   └── QA_REVIEW.md           (qa-review — slim in mvp, full in full)
 
 .pm/jira-config.md            (kanban-flow, first-run setup)
+.pm/cc-config.md              (cc-flow, first-run setup)
+
+.cc-templates/                (cc-flow copies here on first run; consumer-editable)
+  ├── VERSION
+  ├── README.md
+  ├── agents/
+  │   ├── backend-engineer.md.tmpl
+  │   ├── frontend-engineer.md.tmpl
+  │   ├── qa-engineer.md.tmpl
+  │   ├── product-architect.md.tmpl
+  │   └── design-reviewer.md.tmpl
+  └── partials/
+      ├── testing-rigor-mvp.md.tmpl
+      ├── testing-rigor-full.md.tmpl
+      ├── shadcn-theme-notes.md.tmpl
+      └── custom-system-notes.md.tmpl
+
+.claude/agents/<feature>/     (cc-sync renders here per feature)
+  ├── backend-engineer.md
+  ├── frontend-engineer.md
+  ├── qa-engineer.md
+  ├── product-architect.md
+  └── design-reviewer.md
+
+.claude/.cc-manifest.md       (cc-sync ownership + checksum ledger)
 ```
 
 Every artifact is plain markdown. You can edit them by hand, commit them, share them. When a decision changes, re-run the relevant skill and the downstream artifacts update from there.
@@ -175,6 +206,10 @@ Every skill that touches output audits the repo first: existing routes, existing
 ### Persistence you can trust
 
 All state lives on disk under `.<discipline>/<feature>/`. Resume across sessions, diff in git, hand off between teammates. Skills never rely on conversation history alone.
+
+### Guardrails as output
+
+Planning artifacts compile to executable Claude Code context. `cc-sync` renders the stack decisions, token names, API contracts, and test strategy into per-feature agents in `.claude/agents/<feature>/` — so every developer opens a conversation with the right context already loaded. The spec-to-dev-session gap is closed, not bridged by copy-paste.
 
 ### Jira is a thin layer, not the source of truth
 
