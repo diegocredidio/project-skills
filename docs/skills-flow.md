@@ -1,6 +1,6 @@
 # Skills flow
 
-All 41 skills, their artifacts, and the cross-cutting `PROJECT_PROFILE.md` contract rendered as mermaid diagrams. For a terminal-friendly ASCII view, see the main `README.md`.
+All 43 skills, their artifacts, and the cross-cutting `PROJECT_PROFILE.md` contract rendered as mermaid diagrams. For a terminal-friendly ASCII view, see the main `README.md`.
 
 ---
 
@@ -28,6 +28,8 @@ flowchart TD
     Backend -.BACKEND_TASKS.md.-> Kanban
     Frontend -.FRONTEND_TASKS.md.-> Kanban
     QA -.QA_TASKS.md.-> Kanban
+    PM -->|pm-handoff| CC[cc-flow]
+    CC --> Agents[".claude/agents/&lt;feature&gt;/"]
 ```
 
 ---
@@ -129,6 +131,27 @@ flowchart TD
 
 ---
 
+## CC flow
+
+```mermaid
+flowchart TD
+    Flow[cc-flow] --> Setup{Modo}
+    Setup -->|setup 1ª vez| Preflight["pre-flight checks<br/>confirma .pm/&lt;feature&gt;/PRD.md<br/>+ PROJECT_PROFILE.md"]
+    Preflight --> Copy["copia templates/<br/>→ .cc-templates/"]
+    Copy --> Config[(".pm/cc-config.md<br/>templatesVersion + overwritePolicy")]
+    Config --> Dispatch{O que fazer?}
+    Setup -->|cycle| Dispatch
+    Dispatch -->|Sync| Sync[cc-sync]
+    Dispatch -->|Preview| Preview["cc-sync --preview<br/>(dry-run)"]
+    Dispatch -->|Setup only| Done([pronto])
+    Sync --> Manifest[(".claude/.cc-manifest.md<br/>Owned + Archived + User-modified")]
+    Sync --> Agents[(".claude/agents/&lt;feature&gt;/<br/>backend-engineer.md<br/>frontend-engineer.md<br/>qa-engineer.md<br/>product-architect.md<br/>design-reviewer.md")]
+```
+
+cc-sync lê `PROJECT_PROFILE.md` para selecionar partials: `designMode` escolhe entre `shadcn-theme-notes` ou `custom-system-notes`; `testingRigor` escolhe entre `testing-rigor-mvp` ou `testing-rigor-full`.
+
+---
+
 ## Kanban flow
 
 ```mermaid
@@ -160,6 +183,7 @@ flowchart LR
     PP -->|lê| FC[frontend-components]
     PP -->|lê| QS[qa-strategy]
     PP -->|lê| QR[qa-review]
+    PP -->|lê| CS[cc-sync]
     PH -.fallback prompt.-> PP
     DF -.fallback prompt.-> PP
     FS -.fallback prompt.-> PP
@@ -179,5 +203,9 @@ Projetos legados sem o arquivo: os três pontos de fallback-prompt (`pm-handoff`
 | Frontend | `.frontend/<feature>/` | `FRONTEND_BRIEF.md`, `FRONTEND_INTAKE.md`, `FRONTEND_STACK.md`, `FRONTEND_ROUTES.md`, `COMPONENT_PLAN.md`, `FRONTEND_TASKS.md`, `FRONTEND_REVIEW.md` |
 | QA | `.qa/<feature>/` | `QA_BRIEF.md`, `QA_INTAKE.md`, `QA_STRATEGY.md` (slim ou full conforme `testingRigor`), `TEST_CASES.md` (scoped por `testingRigor`), `QA_TASKS.md`, `QA_REVIEW.md` (slim ou full conforme `testingRigor`) |
 | Kanban | `.pm/` | `jira-config.md` (global, first-run) |
+| CC | `.cc-templates/` (consumer repo) | `VERSION`, `README.md`, `agents/*.md.tmpl`, `partials/*.md.tmpl` — copiado pelo cc-flow no primeiro run, consumer-editable depois |
+| CC | `.claude/agents/<feature>/` (consumer repo) | `backend-engineer.md`, `frontend-engineer.md`, `qa-engineer.md`, `product-architect.md`, `design-reviewer.md` — gerados pelo cc-sync |
+| CC | `.claude/` (consumer repo) | `.cc-manifest.md` (ownership + checksum ledger), `archive/<ts>/` (agentes de features removidas) |
+| CC | `.pm/` | `cc-config.md` (global, first-run) |
 
 Todos são markdown plano — editáveis à mão, versionáveis, diffáveis. Re-rodar uma skill atualiza seu arquivo; artefatos downstream se adaptam na próxima execução.
