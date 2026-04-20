@@ -72,8 +72,19 @@ Two ways, same repo, no duplication. Pick what fits your setup.
 
 ### Option 1 — Native Claude Code plugin (recommended)
 
+First, add the marketplace (one-time):
+
 ```
 /plugin marketplace add diegocredidio/project-skills
+```
+
+Then install — choose your scope:
+
+```
+# All projects (recommended)
+/plugin install --scope user project-skills@project-skills
+
+# Current project only
 /plugin install project-skills@project-skills
 ```
 
