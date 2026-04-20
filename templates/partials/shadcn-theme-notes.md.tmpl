@@ -1,0 +1,11 @@
+## Design system: shadcn/ui theme
+
+This project uses **shadcn-theme** mode. The design system is built on top of shadcn/ui with a custom theme delivered as HSL CSS variable overrides.
+
+**Tokens**: use the shadcn CSS variable names directly — `--primary`, `--primary-foreground`, `--background`, `--foreground`, `--muted`, `--muted-foreground`, `--border`, `--radius`, etc. The exact values are defined in {{artifactPaths.tokens}}. Never hardcode hex or HSL values — always reference the variable names.
+
+**Component inventory**: the set of shadcn primitives used in this feature is listed in {{artifactPaths.componentSpecs}}. Use `npx shadcn add <component>` to install any primitive not yet in the project. Do not install a primitive not listed in the spec without updating {{artifactPaths.componentSpecs}} first.
+
+**Custom variants**: non-standard variants (e.g., a `destructive-outline` button or a `compact` card) are defined using CVA (class-variance-authority). Implement them as wrappers around the shadcn primitive, not as modifications to the primitive's source file.
+
+**Roll-your-own components**: for UI elements that have no shadcn equivalent, refer to {{artifactPaths.componentSpecs}} for the spec. Implement against the spec; use shadcn primitives (Button, Dialog, etc.) as building blocks where appropriate.
