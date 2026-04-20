@@ -17,3 +17,6 @@ skills-lock.json
 
 # Claude Code workspace state (this repo is a plugin source, not a workspace)
 .claude/
+
+# Git worktrees
+.worktrees/
