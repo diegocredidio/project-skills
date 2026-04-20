@@ -45,7 +45,8 @@ Options:
 - Backend → gera `BACKEND_BRIEF.md` e invoca `backend-flow`
 - Frontend → gera `FRONTEND_BRIEF.md` e invoca `frontend-flow`
 - QA → gera `QA_BRIEF.md` e invoca `qa-flow`
-- All four
+- CC Guardrails → bootstrap Claude Code agents via `cc-flow`
+- All five
 - "Just generate the briefings" → gera os quatro arquivos sem invocar nenhuma skill ainda
 
 Se o usuário quiser apenas um, gera só o briefing daquele e para. Os outros ficam disponíveis para quando ele quiser rodar `backend-flow` ou `frontend-flow` diretamente — essas skills leem os arquivos do disco de forma independente.
@@ -308,11 +309,16 @@ After generating each briefing, invoke the appropriate skill:
 > Run: `qa-flow`
 > `qa-brief-intake` reads QA_BRIEF.md as its primary input and audits existing test infrastructure.
 
+**CC Guardrails:**
+> "Planning artifacts available at `.pm/<feature-name>/` and the discipline folders. Now invoking `cc-flow` — on first run this copies starter templates into `.cc-templates/` and writes `.pm/cc-config.md`; then `cc-sync` renders per-feature agents into `.claude/agents/<feature-name>/` for the dev to invoke during implementation."
+>
+> Run: `cc-flow`
+
 ### Step 5: Coordination note
 
-If all four are running in parallel, remind the user of the sequencing reality:
+If all five are running in parallel, remind the user of the sequencing reality:
 
-> "Design should start first — frontend needs the specs before building components. Backend can run in parallel with design. QA can start after PRD + architecture are done (in parallel with design/backend). Frontend waits on both design specs and backend contracts. Once everything is built, design-review, backend-review, frontend-review, and qa-review run in parallel."
+> "Design should start first — frontend needs the specs before building components. Backend can run in parallel with design. QA can start after PRD + architecture are done (in parallel with design/backend). Frontend waits on both design specs and backend contracts. Once everything is built, design-review, backend-review, frontend-review, and qa-review run in parallel. CC Guardrails (`cc-flow`) can run any time after the discipline artifacts exist — it doesn't block any other workstream and produces `.claude/agents/<feature>/` for developers to invoke during implementation."
 
 ## Rules
 
@@ -322,3 +328,4 @@ If all four are running in parallel, remind the user of the sequencing reality:
 - If a required piece of information is missing from PM artifacts, flag it in the briefing as `[TO BE DEFINED]` rather than inventing it
 - The handoff is one-way — do not loop back into PM skills from here. If new requirements emerge during specialist work, use `pm-review` to reassess
 - Read `.pm/<feature-name>/PROJECT_PROFILE.md` before generating briefs. If missing, prompt once and create it — do NOT re-run pm-grill.
+- `cc-flow` is optional but closes the dev loop — invoke after all disciplines have produced artifacts and it writes guardrails into `.claude/agents/<feature>/` for developers to invoke.
