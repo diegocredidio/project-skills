@@ -1,0 +1,9 @@
+## Testing approach: MVP
+
+This project uses **mvp** testing rigor — a smoke pyramid focused on critical paths and must-have requirements.
+
+Write unit tests only where the logic is genuinely non-trivial (calculations, transformations, validations with business rules). For integration, test the happy path of each major data flow. For end-to-end, write exactly one test per distinct user journey; do not duplicate coverage already provided by lower-level tests.
+
+Cover only functional requirements marked "must" in the PRD. Non-must requirements and edge cases are acknowledged but not tested unless they represent a known failure risk. Coverage is risk-weighted, not numeric — there is no line or branch coverage target for this project. If in doubt, write the test that catches the bug most likely to slip to production.
+
+Skip visual regression, a11y matrix, and performance budget tests for this project. Those are tracked as future work when rigor is upgraded to `full`.
