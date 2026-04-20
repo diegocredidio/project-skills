@@ -1,0 +1,11 @@
+## Design system: custom
+
+This project uses **custom-system** mode. The design system is a full custom token architecture — no shadcn/ui or third-party component library default theme.
+
+**Tokens**: the full token set is defined in {{artifactPaths.tokens}}. It covers spacing scale, typography (font families, sizes, line heights, weights), color palette (semantic + primitive), motion (duration, easing), radius, z-index, and shadow. Never hardcode any of these values — always reference the token name (CSS variable, JS constant, or whatever the project's token delivery format specifies). If a value you need is not in the token set, raise it with the designer before hardcoding.
+
+**Primitives**: every UI primitive (Button, Input, Card, Modal, etc.) is specified in {{artifactPaths.componentSpecs}}. Implement each primitive strictly per its spec: the variants, sizes, states (default, hover, focus, disabled, error), and composition rules are all defined there. Do not create an ad-hoc component for something that has a spec — always implement the primitive first, then compose.
+
+**Composition**: the component plan at {{artifactPaths.componentPlan}} shows which primitives compose into feature components and in what hierarchy. Follow the composition plan; do not flatten or restructure the component tree without updating the plan first.
+
+**Adding primitives**: if a new primitive is needed that is not in the spec, add it to {{artifactPaths.componentSpecs}} with at minimum the variant list, states, and token references before writing any code.
