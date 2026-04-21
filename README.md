@@ -84,13 +84,9 @@ First, add the marketplace (one-time):
 /plugin marketplace add diegocredidio/project-skills
 ```
 
-Then install — choose your scope:
+Then install:
 
 ```
-# All projects (recommended)
-/plugin install --scope user project-skills@project-skills
-
-# Current project only
 /plugin install project-skills@project-skills
 ```
 
