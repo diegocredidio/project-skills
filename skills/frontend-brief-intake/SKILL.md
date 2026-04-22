@@ -48,6 +48,18 @@ If the parent folder is missing any of the three files, proceed with what's avai
 
 If `PARENT.md` does not exist, skip this step and continue to Step 3 in standalone mode.
 
+### Step 2.6: BDD contract check
+
+Check for `.bdd/<feature>/FRONTEND_FEATURES.md`.
+
+If present:
+- Read the file
+- For each FR-ID in the file, note the behavioral contract (the scenarios that describe what the frontend must do from the user's perspective)
+- These contracts are pre-agreed behavioral specifications — a frontend concern with a matching scenario in FRONTEND_FEATURES.md is behaviorally specified; classify it as ✅ clear in Step 3 (behavior is defined), not as a grill candidate
+- Note the FR-IDs covered by BDD scenarios for use in the Step 4 grill gate
+
+If absent: skip this step.
+
 ### Step 3: Classify every frontend concern
 
 For each, mark ✅ clear / ⚠️ ambiguous / ❌ missing:
@@ -66,7 +78,7 @@ For each, mark ✅ clear / ⚠️ ambiguous / ❌ missing:
 
 ### Step 4: Embedded gap-fill grill
 
-Ask questions (one at a time, Critical → Important) **only for ⚠️ / ❌ items**. Never re-ask ✅ items, and never re-grill concerns that Step 2.5 classified as inherited from the parent. Offer defaults:
+Ask questions (one at a time, Critical → Important) **only for ⚠️ / ❌ items**. Never re-ask ✅ items, never re-grill concerns that Step 2.5 classified as inherited from the parent, and never grill concerns for FRs that have matching scenarios in FRONTEND_FEATURES.md — the behavioral specification is already agreed. Offer defaults:
 
 - "Framework — the codebase has Next.js 14 App Router. Confirm?"
 - "Styling — Tailwind + shadcn (per design TOKENS.md)? Default yes if design used this."
@@ -157,3 +169,4 @@ Tell the user: "Intake done. [N] concerns classified, [M] ambiguities resolved. 
 - Critical items (framework, styling, state) cannot be deferred — push to a decision or explicitly block.
 - If brief + codebase conflict on framework, call it out immediately. Frontend stack choice cascades into everything.
 - When `.pm/<feature>/PARENT.md` exists, inherit the parent's `FRONTEND_STACK.md`, `FRONTEND_ROUTES.md`, and `COMPONENT_PLAN.md` as ✅ clear. Never re-grill framework, styling system, state management, forms library, data-fetching approach, auth client, testing frameworks, or hosting target when the parent already resolved them. New UI concerns introduced by the evolution (new routes, new components) are still in scope for the grill.
+- If `.bdd/<feature>/FRONTEND_FEATURES.md` exists, treat its scenarios as agreed behavioral contracts — do not re-derive or contradict them.
