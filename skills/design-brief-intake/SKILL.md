@@ -48,7 +48,7 @@ If `.pm/<feature>/PARENT.md` exists, this feature is an evolution of a parent sl
 
 Treat these as ✅ clear inheritance. In Step 3, classify the inherited items as ✅ clear — do NOT re-pick tokens (colors, spacing, radii, typography) or re-spec components that the parent already resolved. At emission time (the step that writes the enriched brief), annotate each inherited item with "(inherited from parent)" in the "Existing patterns" section (or equivalent) of the output. Child brief adds only net-new tokens, components, or IA structure the improvement genuinely requires.
 
-Record parent artifact paths in the output's "Parent baseline" section alongside the existing-patterns section.
+Record parent artifact paths in the output's "Parent design baseline" section alongside the existing-patterns section.
 
 If the parent folder is missing any of the three files, proceed with what's available and note the absence.
 
