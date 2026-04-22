@@ -15,6 +15,7 @@ Check for existing artifacts:
 1. Look for `.pm/<feature-name>/GRILL_SUMMARY.md` — if it exists, use it as the primary input
 2. If no grill summary exists, ask the user for a detailed description. Consider suggesting they run `pm-grill` first.
 3. Explore the codebase to understand existing patterns, APIs, components, and constraints
+4. **Lineage check:** if `.pm/<feature-name>/PARENT.md` exists, also read `.pm/<parent>/PRD.md` — extract the full FR-XXX list and find the maximum ID. The child's FR-IDs will continue from `max + 1`. Also note which parent FRs the child's improvement summary relates to; these populate the "Extends" table in the generated PRD. Read the parent slug from PARENT.md's H1 (`# Parent: <parent-slug>`).
 
 ### Step 2: Ask PRD-specific questions
 
@@ -27,6 +28,8 @@ Before writing, clarify anything not covered by the grill:
 
 Use this template. Adapt sections based on project complexity — a small feature needs less than a full product.
 
+**Lineage-only sections:** sections prefixed "lineage-only" must be emitted ONLY when `.pm/<feature-name>/PARENT.md` exists. If lineage is absent, omit the section entirely (do not emit the heading with empty body).
+
 ```markdown
 # PRD: [Feature/Project Name]
 
@@ -36,6 +39,17 @@ Use this template. Adapt sections based on project complexity — a small featur
 **Version:** 1.0
 
 ---
+
+## 0. Extends (lineage-only — omit if this is a standalone feature)
+
+**Parent feature:** `<parent-slug>` — see `.pm/<parent>/PRD.md`
+**This PRD extends:** list the parent FR-IDs this evolution modifies or builds on.
+**FR-ID continuation:** FR-XXX in this PRD start at `max(parent FR-IDs) + 1` to avoid cross-slug collision.
+
+| Parent FR | Relationship | Child FR | Summary |
+|-----------|--------------|----------|---------|
+| FR-003 | extends | FR-010 | Adds TOTP step after password verification |
+| FR-004 | unchanged | — | Password reset flow untouched |
 
 ## 1. Problem Statement
 
@@ -154,3 +168,4 @@ Save to `.pm/<feature-name>/PRD.md`.
 - Write for the broadest audience — a designer, a developer, and a business stakeholder should all understand it
 - If the grill summary has open questions, flag them prominently — don't bury them
 - Each functional requirement gets a unique ID (FR-001) for traceability in later steps
+- When `.pm/<feature>/PARENT.md` exists, emit the `## 0. Extends` section at the top of the PRD and start FR numbering from `max(parent FR-IDs) + 1`. Never reuse parent FR-IDs — they are traceable identifiers across slugs.
