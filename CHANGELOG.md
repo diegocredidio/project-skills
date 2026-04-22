@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] — 2026-04-22
+
+### Added
+
+- `pm-extend` skill — lineage-aware Step-0 entry point for evolving an existing feature. Writes `PARENT.md` (lineage ledger: parent slug, present-artifact table, FR-ID baseline), copies `PROJECT_PROFILE.md` to the child slug (inheriting `designMode`, `uiFramework`, `testingRigor`), seeds `INTAKE.md`, then hands off to `pm-flow` which auto-selects Path B.
+- `PARENT.md` lineage ledger — canonical signal that activates lineage-aware mode in all downstream skills. Written by `pm-extend`; read by `pm-grill`, `pm-prd`, `pm-architecture`, `backend-brief-intake`, `frontend-brief-intake`, `design-brief-intake`, and `qa-brief-intake`.
+
+### Changed
+
+- `pm-flow` — Step 1 now shows evolution slugs alongside new-feature option and auto-selects Path B when `PARENT.md` is present (skipping the existing-material prompt). New Rules bullet scopes `pm-extend` responsibility boundary.
+- `pm-grill` — Step A1 (gap-fill mode) adds Lineage check: reads parent `GRILL_SUMMARY.md` + `PROJECT_PROFILE.md` when `PARENT.md` exists. User-facing opening message has two templates (with / without lineage) to prevent conditional-parenthetical leakage. New Rules bullet.
+- `pm-prd` — Step 1 reads `**FR-ID baseline:**` from `PARENT.md` as primary FR-ID source; reads parent `PRD.md` as secondary for related-FR identification. Adds lineage-only `## 0. Extends` section to template (HTML-comment sentinel + pinned Relationship vocabulary). New Rules bullet: child FR-IDs continue from `max(parent) + 1`.
+- `pm-architecture` — Step 1 reads parent `ARCHITECTURE.md` when `PARENT.md` is present. Adds `### Lineage` subsection to §1 System Overview and Status column (`inherited / extended / new`) to §2 Stack Decisions. New Rules bullets: inherit same major versions, no silent divergence.
+- `backend-brief-intake` — new Step 2.5 reads parent `BACKEND_STACK.md`, `BACKEND_DATA.md`, `BACKEND_API.md` and classifies inherited items; Step 4 grill gate excludes items classified as inherited; template gains `## Parent baseline` section; new Rules bullet locks backend conventions from parent.
+- `frontend-brief-intake` — same Step 2.5 / grill-gate / template pattern as backend, covering `FRONTEND_STACK.md`, `FRONTEND_ROUTES.md`, `COMPONENT_PLAN.md`.
+- `design-brief-intake` — same Step 2.5 / template pattern, covering `TOKENS.md`, `COMPONENT_SPECS.md`, `IA.md`; section heading `## Parent design baseline`.
+- `qa-brief-intake` — same Step 2.5 / template pattern, covering `QA_STRATEGY.md`, `TEST_CASES.md`; section heading `## Parent QA baseline`; additive TC rule (child TCs never duplicate parent TCs).
+- README: skill count 43 → 44, new "Evolving a feature" section, `pm-extend? ↘` entry in ASCII flow map, `PARENT.md` added to `.pm/<feature>/` artifacts table.
+- `docs/skills-flow.md`: 43 → 44 in intro, `pm-extend` node wired into PM flow mermaid.
+
 ## [1.2.0] — 2026-04-20
 
 ### Added
