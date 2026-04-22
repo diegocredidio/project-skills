@@ -33,6 +33,21 @@ Read:
 
 Record what's present with versions.
 
+### Step 2.5: Parent artifact read (lineage-only)
+
+If `.pm/<feature>/PARENT.md` exists, this feature is an evolution of a parent slug. Read the parent slug from `PARENT.md`'s H1 (`# Parent: <parent-slug>`), then also read:
+- `.frontend/<parent-slug>/FRONTEND_STACK.md` — framework, styling, state, forms, auth client, testing, hosting
+- `.frontend/<parent-slug>/FRONTEND_ROUTES.md` — route inventory, layout tree, auth gates
+- `.frontend/<parent-slug>/COMPONENT_PLAN.md` — component inventory and per-component source (shadcn, custom, reuse)
+
+Treat these as ✅ clear inheritance. In Step 3, classify the inherited concerns as ✅ clear — do NOT re-interrogate framework, styling system, state management, forms library, auth client, testing tools, or hosting when those were resolved in the parent. At emission time (the step that writes the intake document), annotate each inherited concern with "(inherited from parent)" in the Source column of the output's "What's clear" or equivalent table. The embedded gap-fill grill (Step 4) asks only about concerns the child INTRODUCES.
+
+Record parent artifact paths in the output's "Parent baseline" section alongside the codebase-detected section.
+
+If the parent folder is missing any of the three files, proceed with what's available and note the absence.
+
+If `PARENT.md` does not exist, skip this step and continue to Step 3 in standalone mode.
+
 ### Step 3: Classify every frontend concern
 
 For each, mark ✅ clear / ⚠️ ambiguous / ❌ missing:
@@ -51,7 +66,7 @@ For each, mark ✅ clear / ⚠️ ambiguous / ❌ missing:
 
 ### Step 4: Embedded gap-fill grill
 
-Ask questions (one at a time, Critical → Important) **only for ⚠️ / ❌ items**. Offer defaults:
+Ask questions (one at a time, Critical → Important) **only for ⚠️ / ❌ items**. Never re-ask ✅ items, and never re-grill concerns that Step 2.5 classified as inherited from the parent. Offer defaults:
 
 - "Framework — the codebase has Next.js 14 App Router. Confirm?"
 - "Styling — Tailwind + shadcn (per design TOKENS.md)? Default yes if design used this."
@@ -70,6 +85,8 @@ Surface conflicts between inputs:
 ### Step 6: Write FRONTEND_INTAKE.md
 
 Save to `.frontend/<feature>/FRONTEND_INTAKE.md`:
+
+**Lineage-only sections:** sections marked with an HTML comment starting `<!-- lineage-only: ... -->` must be emitted ONLY when `.pm/<feature>/PARENT.md` exists. If lineage is absent, omit the entire section (comment and heading). When emitting, delete the HTML comment line — it's an authoring marker, not document content.
 
 ```markdown
 # Frontend Intake: [Feature Name]
@@ -102,6 +119,15 @@ Save to `.frontend/<feature>/FRONTEND_INTAKE.md`:
 - **Testing:** none installed
 - **Auth client:** none installed
 
+<!-- lineage-only: emit this entire section ONLY when PARENT.md exists; delete this comment on emit -->
+## Parent baseline
+
+| Artifact | Path | Key inheritance |
+|----------|------|-----------------|
+| Frontend stack | .frontend/<parent-slug>/FRONTEND_STACK.md | [one-line summary of inherited framework/styling/state/forms/auth/testing] |
+| Routes | .frontend/<parent-slug>/FRONTEND_ROUTES.md | [one-line summary of inherited routes and layout tree] |
+| Components | .frontend/<parent-slug>/COMPONENT_PLAN.md | [one-line summary of inherited components and sourcing strategy] |
+
 ## Design artifact availability
 
 | Artifact | Present | Path |
@@ -130,3 +156,4 @@ Tell the user: "Intake done. [N] concerns classified, [M] ambiguities resolved. 
 - If a key design artifact is missing (TOKENS.md, COMPONENT_SPECS.md), proceed but flag it. Downstream skills handle the gap.
 - Critical items (framework, styling, state) cannot be deferred — push to a decision or explicitly block.
 - If brief + codebase conflict on framework, call it out immediately. Frontend stack choice cascades into everything.
+- When `.pm/<feature>/PARENT.md` exists, inherit the parent's `FRONTEND_STACK.md`, `FRONTEND_ROUTES.md`, and `COMPONENT_PLAN.md` as ✅ clear. Never re-grill framework, styling system, state management, forms library, data-fetching approach, auth client, testing frameworks, or hosting target when the parent already resolved them. New UI concerns introduced by the evolution (new routes, new components) are still in scope for the grill.
