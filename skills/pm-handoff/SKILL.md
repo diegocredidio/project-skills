@@ -20,6 +20,7 @@ Check that `.pm/<feature-name>/` contains at minimum:
 If any are missing, warn the user: "The [file] is missing. You can run `pm-[step]` to generate it, or continue with what's available."
 
 Optional but useful: `GRILL_SUMMARY.md`, `REVIEW.md`, `INTAKE.md`
+- `.bdd/<feature-name>/BACKEND_FEATURES.md` + `FRONTEND_FEATURES.md` — BDD behavioral contracts (if `bdd-flow` was run before handoff)
 
 ### Step 1.5: Read PROJECT_PROFILE.md
 
@@ -41,6 +42,7 @@ Write the file with the user's answer and continue. Do NOT re-run pm-grill.
 > "Which workstreams do you want to start? You can pick one now and come back for the others later — or start all four."
 
 Options:
+- BDD session (optional, pre-discipline) → conduct Three Amigos session first, writing `.bdd/<feature>/BACKEND_FEATURES.md` and `.bdd/<feature>/FRONTEND_FEATURES.md` as behavioral contracts for the discipline flows
 - Design → gera `DESIGN_BRIEF.md` e invoca `design-flow`
 - Backend → gera `BACKEND_BRIEF.md` e invoca `backend-flow`
 - Frontend → gera `FRONTEND_BRIEF.md` e invoca `frontend-flow`
@@ -48,6 +50,12 @@ Options:
 - CC Guardrails → bootstrap Claude Code agents via `cc-flow`
 - All five
 - "Just generate the briefings" → gera os quatro arquivos sem invocar nenhuma skill ainda
+
+Se o usuário escolher BDD session:
+1. Invocar `bdd-flow` para a feature
+2. Após `bdd-flow` completar, retornar à seleção de workstreams: "BDD session complete. Which workstreams do you want to start now?"
+
+O BDD é uma etapa pré-disciplina — não substitui nenhum workstream. Após a sessão BDD, o usuário ainda escolhe quais discipline flows rodar.
 
 Se o usuário quiser apenas um, gera só o briefing daquele e para. Os outros ficam disponíveis para quando ele quiser rodar `backend-flow` ou `frontend-flow` diretamente — essas skills leem os arquivos do disco de forma independente.
 
