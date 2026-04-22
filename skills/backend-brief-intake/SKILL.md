@@ -31,6 +31,21 @@ Read:
 - Existing migrations under `prisma/migrations/`, `alembic/versions/`, `db/migrate/`, etc.
 - Existing auth / middleware / repository patterns
 
+### Step 2.5: Parent artifact read (lineage-only)
+
+If `.pm/<feature>/PARENT.md` exists, this feature is an evolution of a parent slug. Read the parent slug from `PARENT.md`'s H1 (`# Parent: <parent-slug>`), then also read:
+- `.backend/<parent-slug>/BACKEND_STACK.md` — runtime, framework, DB, ORM, validation, auth
+- `.backend/<parent-slug>/BACKEND_DATA.md` — entities, relationships, migration history
+- `.backend/<parent-slug>/BACKEND_API.md` — endpoint inventory, conventions, error format
+
+Treat these as ✅ clear inheritance. In Step 3, mark inherited concerns ✅ with "(inherited from parent)" in the Source column instead of re-classifying. The embedded gap-fill grill (Step 4) then asks only about concerns the child INTRODUCES — not runtime choice, framework, DB engine, auth strategy, or API style when those were resolved in the parent.
+
+Record parent artifact paths in the output's "Parent baseline" section alongside "Codebase reality" — user and downstream skills see both.
+
+If the parent folder is missing any of the three files, proceed with what's available and note the absence.
+
+If `PARENT.md` does not exist, this step is a no-op — continue to Step 3 in standalone mode.
+
 ### Step 3: Classify every backend concern
 
 For each of these, mark ✅ clear / ⚠️ ambiguous / ❌ missing:
@@ -75,6 +90,8 @@ If brief + codebase disagree, flag it:
 
 Save to `.backend/<feature>/BACKEND_INTAKE.md`:
 
+**Lineage-only sections:** sections marked with an HTML comment starting `<!-- lineage-only: ... -->` must be emitted ONLY when `.pm/<feature-name>/PARENT.md` exists. If lineage is absent, omit the entire section (comment and heading). When emitting, delete the HTML comment line — it's an authoring marker, not document content.
+
 ```markdown
 # Backend Intake: [Feature Name]
 
@@ -111,6 +128,15 @@ Save to `.backend/<feature>/BACKEND_INTAKE.md`:
 - Deps NOT matching: [express — legacy, to be removed]
 - Migration state: [10 prior migrations, schema stable]
 
+<!-- lineage-only: emit this entire section ONLY when PARENT.md exists; delete this comment on emit -->
+## Parent baseline
+
+| Artifact | Path | Key inheritance |
+|----------|------|-----------------|
+| Backend stack | .backend/<parent-slug>/BACKEND_STACK.md | [one-line summary of inherited runtime/framework/DB/auth] |
+| Data model | .backend/<parent-slug>/BACKEND_DATA.md | [one-line summary of inherited entities] |
+| API surface | .backend/<parent-slug>/BACKEND_API.md | [one-line summary of inherited endpoints and conventions] |
+
 ## Conflicts surfaced
 
 - [Brief says X, codebase has Y → resolution]
@@ -131,3 +157,4 @@ Tell the user: "Intake complete. [N] concerns classified, [M] ambiguities resolv
 - If the codebase contradicts the brief on a foundational choice, resolve before proceeding — don't let `backend-stack` inherit the ambiguity.
 - If the brief is thin (< 30 lines), expect the grill to be longer — that's fine.
 - This skill does not make implementation decisions about folder structure or coding conventions. Those belong to `backend-stack`.
+- When `.pm/<feature-name>/PARENT.md` exists, inherit the parent's backend stack/data/API as ✅ clear. Never re-grill runtime, framework, DB, or auth choice if parent already resolved them. New concerns introduced by the evolution are still in scope for the grill.
