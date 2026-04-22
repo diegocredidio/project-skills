@@ -21,6 +21,10 @@ Read these in order:
    - API routes, controllers, handlers — existing API surface
    - `.env.example`, config files — environment and integrations
    - Component library, design system files — frontend patterns
+4. **Lineage check:** if `.pm/<feature-name>/PARENT.md` exists:
+   - Read the parent slug from `PARENT.md`'s H1 (`# Parent: <parent-slug>`).
+   - Read `.pm/<parent-slug>/ARCHITECTURE.md` — treat the parent's stack decisions, API conventions, and data model as the baseline. Do NOT re-derive them.
+   - The child's architecture is a **delta document** over the parent's. In the output, mark every section as `inherited`, `extended`, or `new` (see Step 3 template).
 
 ### Step 1.5: Read PROJECT_PROFILE.md
 
@@ -68,16 +72,29 @@ A high-level diagram description — what talks to what.]
                                 → [External: Payment API]
 ```
 
+<!-- lineage-only: emit this subsection ONLY when PARENT.md exists; delete this comment on emit -->
+### Lineage
+
+This architecture extends `<parent-slug>`'s baseline. Summary of deltas:
+
+- **Reused wholesale:** [list subsystems not touched — e.g., existing auth tables, session management]
+- **Extended:** [list subsystems the child adds to — e.g., new `[child_table]` table, new `/[path]/*` endpoints]
+- **Modified:** [list parent behaviors the child changes]
+
+See `.pm/<parent-slug>/ARCHITECTURE.md` for the full baseline.
+
 ## 2. Stack Decisions
 
-| Layer | Choice | Rationale |
-|-------|--------|-----------|
-| Frontend | [Framework] | [Why] |
-| Backend | [Language/Framework] | [Why] |
-| Database | [DB type and name] | [Why] |
-| Auth | [Strategy] | [Why] |
-| Hosting | [Platform] | [Why] |
-| CI/CD | [Tool] | [Why] |
+**Inherited vs. new:** when `.pm/<feature-name>/PARENT.md` exists, include the `Status` column below (values: `inherited`, `extended`, `new`) and flag each layer accordingly. When standalone, omit the `Status` column entirely.
+
+| Layer | Choice | Status | Rationale |
+|-------|--------|--------|-----------|
+| Frontend | [Framework] | [inherited\|extended\|new] | [Why — if inherited, cite parent; if extended/new, justify the delta] |
+| Backend | [Language/Framework] | [inherited\|extended\|new] | [Why] |
+| Database | [DB type and name] | [inherited\|extended\|new] | [Why] |
+| Auth | [Strategy] | [inherited\|extended\|new] | [Why] |
+| Hosting | [Platform] | [inherited\|extended\|new] | [Why] |
+| CI/CD | [Tool] | [inherited\|extended\|new] | [Why] |
 
 ### Existing stack (if applicable)
 [What's already in place and what we're adding to it]
@@ -192,3 +209,5 @@ Save to `.pm/<feature-name>/ARCHITECTURE.md`.
 - Flag technical risks explicitly — don't hide complexity
 - If the user's constraints conflict (e.g., "real-time + serverless + no budget"), surface the tension and propose trade-offs
 - Keep the data model focused on this feature — don't redesign the entire database
+- When `.pm/<feature-name>/PARENT.md` exists, the child's architecture is a delta document. Inherit the parent's stack verbatim unless there is an explicit reason to change — and if you change, document the reason in the Decision Log table. Flag every decision as inherited / extended / new.
+- Never silently diverge from the parent's stack. A different ORM, language, or auth provider is a Decision, not a detail.
