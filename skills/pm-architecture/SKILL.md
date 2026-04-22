@@ -50,6 +50,8 @@ If the codebase already answers these, state what you found instead of asking.
 
 ### Step 3: Write the architecture document
 
+**Lineage-only sections:** sections marked with an HTML comment starting `<!-- lineage-only: ... -->` must be emitted ONLY when `.pm/<feature-name>/PARENT.md` exists. If lineage is absent, omit the entire section (comment and heading). When emitting, delete the HTML comment line — it's an authoring marker, not document content.
+
 ```markdown
 # Technical Architecture: [Feature/Project Name]
 
@@ -87,9 +89,11 @@ See `.pm/<parent-slug>/ARCHITECTURE.md` for the full baseline.
 
 **Inherited vs. new:** when `.pm/<feature-name>/PARENT.md` exists, include the `Status` column below (values: `inherited`, `extended`, `new`) and flag each layer accordingly. When standalone, omit the `Status` column entirely.
 
+**Rationale guidance:** if `Status` is `inherited`, cite the parent as the source; if `extended` or `new`, justify the delta (what changed and why).
+
 | Layer | Choice | Status | Rationale |
 |-------|--------|--------|-----------|
-| Frontend | [Framework] | [inherited\|extended\|new] | [Why — if inherited, cite parent; if extended/new, justify the delta] |
+| Frontend | [Framework] | [inherited\|extended\|new] | [Why] |
 | Backend | [Language/Framework] | [inherited\|extended\|new] | [Why] |
 | Database | [DB type and name] | [inherited\|extended\|new] | [Why] |
 | Auth | [Strategy] | [inherited\|extended\|new] | [Why] |
@@ -209,5 +213,5 @@ Save to `.pm/<feature-name>/ARCHITECTURE.md`.
 - Flag technical risks explicitly — don't hide complexity
 - If the user's constraints conflict (e.g., "real-time + serverless + no budget"), surface the tension and propose trade-offs
 - Keep the data model focused on this feature — don't redesign the entire database
-- When `.pm/<feature-name>/PARENT.md` exists, the child's architecture is a delta document. Inherit the parent's stack verbatim unless there is an explicit reason to change — and if you change, document the reason in the Decision Log table. Flag every decision as inherited / extended / new.
+- When `.pm/<feature-name>/PARENT.md` exists, the child's architecture is a delta document. Inherit the parent's stack verbatim — same technologies, same major versions. A major-version bump (Node 18 → 20, Postgres 14 → 16) is a Decision and requires a Decision Log entry; a patch/minor bump is not. Flag every stack row as inherited / extended / new.
 - Never silently diverge from the parent's stack. A different ORM, language, or auth provider is a Decision, not a detail.
