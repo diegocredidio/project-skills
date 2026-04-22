@@ -46,6 +46,18 @@ If the parent folder is missing any of the three files, proceed with what's avai
 
 If `PARENT.md` does not exist, this step is a no-op — continue to Step 3 in standalone mode.
 
+### Step 2.6: BDD contract check
+
+Check for `.bdd/<feature>/BACKEND_FEATURES.md`.
+
+If present:
+- Read the file
+- For each FR-ID in the file, note the behavioral contract (the scenarios that describe what the backend must do)
+- These contracts are pre-agreed behavioral specifications — a backend concern with a matching scenario in BACKEND_FEATURES.md is behaviorally specified; classify it as ✅ clear in Step 3 (behavior is defined), not as a grill candidate
+- Note the FR-IDs covered by BDD scenarios for use in the Step 4 grill gate
+
+If absent: skip this step.
+
 ### Step 3: Classify every backend concern
 
 For each of these, mark ✅ clear / ⚠️ ambiguous / ❌ missing:
@@ -68,7 +80,7 @@ For each of these, mark ✅ clear / ⚠️ ambiguous / ❌ missing:
 
 ### Step 4: Embedded gap-fill grill
 
-Ask one question at a time, ordered Critical → Important, **only for items marked ⚠️ or ❌**. Never re-ask ✅ items, and never re-grill concerns that Step 2.5 classified as inherited from the parent.
+Ask one question at a time, ordered Critical → Important, **only for items marked ⚠️ or ❌**. Never re-ask ✅ items, and never re-grill concerns that Step 2.5 classified as inherited from the parent, and never grill concerns for FRs that have matching scenarios in BACKEND_FEATURES.md — the behavioral specification is already agreed.
 
 For each question, offer a default the user can accept with "yes":
 
@@ -158,3 +170,4 @@ Tell the user: "Intake complete. [N] concerns classified, [M] ambiguities resolv
 - If the brief is thin (< 30 lines), expect the grill to be longer — that's fine.
 - This skill does not make implementation decisions about folder structure or coding conventions. Those belong to `backend-stack`.
 - When `.pm/<feature>/PARENT.md` exists, inherit the parent's `BACKEND_STACK.md`, `BACKEND_DATA.md`, and `BACKEND_API.md` as ✅ clear. Never re-grill runtime, framework, DB, ORM, validation, auth strategy, API style, endpoint conventions, or migration history when the parent already resolved them. New concerns introduced by the evolution are still in scope for the grill.
+- If `.bdd/<feature>/BACKEND_FEATURES.md` exists, treat its scenarios as agreed behavioral contracts — do not re-derive or contradict them.
