@@ -1,6 +1,6 @@
 # project-skills
 
-**44 skills for Claude Code that take a project from a vague idea to a Jira-backed implementation plan across PM, design, backend, frontend, QA, and Claude Code guardrails — with room to re-run any one phase when a decision changes.**
+**46 skills for Claude Code that take a project from a vague idea to a Jira-backed implementation plan across PM, design, backend, frontend, QA, and Claude Code guardrails — with room to re-run any one phase when a decision changes.**
 
 Inspired by [Julian Oczkowski's designer-skills](https://github.com/julianoczkowski/designer-skills) and [Matt Pocock's skills](https://github.com/mattpocock/skills) — rewritten from scratch, no external runtime dependencies.
 
@@ -8,13 +8,15 @@ Inspired by [Julian Oczkowski's designer-skills](https://github.com/julianoczkow
 
 ## What this gives you
 
-Seven families of skills (pm-flow, design-flow, backend-flow, frontend-flow, qa-flow, kanban-flow, cc-flow), each a re-invocable piece of a larger flow:
+Eight families of skills (pm-flow, bdd-flow, design-flow, backend-flow, frontend-flow, qa-flow, kanban-flow, cc-flow), each a re-invocable piece of a larger flow:
 
 ```
 pm-extend? ↘
              pm-flow
   pm-intake? → pm-grill → pm-prd → pm-architecture
   → pm-workstreams → pm-tasks → pm-review → pm-handoff
+                                               ↓ (optional)
+                                          bdd-flow? → writes .bdd/<feature>/
                                                ↓
       ┌────────────────────┬────────────────┬──┴──────────────────┐
       ↓                    ↓                ↓                     ↓
@@ -87,6 +89,25 @@ pm-extend
 
 `pm-extend` is the only entry point for lineage-aware work. Once it writes `PARENT.md`, every downstream brief-intake skill (`backend-brief-intake`, `frontend-brief-intake`, `design-brief-intake`, `qa-brief-intake`) detects it automatically and loads the parent's artifacts as an inherited baseline — so you never re-litigate stack choices or re-describe existing components. Child FR-IDs continue from `max(parent FR-IDs) + 1` to keep traceability intact across the lineage.
 
+### BDD-first workflow
+
+Teams that practice BDD can run `bdd-flow` after `pm-architecture` and before discipline flows, writing a shared behavioral contract that both backend and frontend implement against:
+
+```
+bdd-flow
+  → conducts Three Amigos session (PM + Dev + QA) per FR
+  → writes .bdd/<feature>/BACKEND_FEATURES.md   (API-level Gherkin)
+  → writes .bdd/<feature>/FRONTEND_FEATURES.md  (UI-level Gherkin)
+```
+
+`bdd-flow` is optional — teams that don't use BDD see no change. When the feature files exist:
+
+- `backend-brief-intake` reads `BACKEND_FEATURES.md` as pre-agreed behavioral contracts — concerns with matching scenarios are classified as clear without grilling
+- `frontend-brief-intake` reads `FRONTEND_FEATURES.md` the same way
+- `qa-cases` switches to augment mode: imports FR anchors from both files to build the coverage matrix and adds edge cases, instead of writing scenarios from scratch
+
+Lineage-aware: if the feature was created via `pm-extend`, `bdd-flow` loads the parent's BDD files as baseline and only runs the Three Amigos session for new or modified FRs.
+
 ## Install
 
 Two ways, same repo, no duplication. Pick what fits your setup.
@@ -133,6 +154,10 @@ Every skill reads from and writes to `.<discipline>/<feature>/` in the target re
   ├── TASKS.md               (pm-tasks)
   ├── REVIEW.md              (pm-review)
   └── JIRA_MAP.md            (kanban-sync idempotency map)
+
+.bdd/<feature>/
+  ├── BACKEND_FEATURES.md    (bdd-flow — API-level Gherkin scenarios; read by backend-brief-intake)
+  └── FRONTEND_FEATURES.md   (bdd-flow — UI-level Gherkin scenarios; read by frontend-brief-intake, qa-cases)
 
 .design/<feature>/
   ├── DESIGN_GRILL.md        (design-grill, Path B only)

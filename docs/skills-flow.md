@@ -1,6 +1,6 @@
 # Skills flow
 
-All 44 skills, their artifacts, and the cross-cutting `PROJECT_PROFILE.md` contract rendered as mermaid diagrams. For a terminal-friendly ASCII view, see the main `README.md`.
+All 46 skills, their artifacts, and the cross-cutting `PROJECT_PROFILE.md` contract rendered as mermaid diagrams. For a terminal-friendly ASCII view, see the main `README.md`.
 
 ---
 
@@ -51,6 +51,11 @@ flowchart LR
     Review --> Handoff[pm-handoff]
     Grill -.escreve.-> PP[("PROJECT_PROFILE.md<br/>designMode + uiFramework + testingRigor")]
     Handoff -.lê.-> PP
+    Handoff -->|opcional| BDD["bdd-flow<br/>Three Amigos session"]
+    BDD -.writes.-> BDDFiles[(".bdd/&lt;feature&gt;/<br/>BACKEND_FEATURES.md<br/>FRONTEND_FEATURES.md")]
+    BDDFiles -.behavioral contracts.-> BackendFlow[backend-flow]
+    BDDFiles -.behavioral contracts.-> FrontendFlow[frontend-flow]
+    BDDFiles -.augments.-> QACases["qa-cases<br/>(augment mode)"]
     Handoff --> DesignFlow[design-flow]
     Handoff --> BackendFlow[backend-flow]
     Handoff --> FrontendFlow[frontend-flow]

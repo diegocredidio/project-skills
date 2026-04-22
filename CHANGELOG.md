@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.4.0] — 2026-04-22
+
+### Added
+
+- `bdd-flow` skill — thin orchestrator for the BDD session flow. Verifies PRD.md + ARCHITECTURE.md are present, creates `.bdd/<feature>/`, invokes `bdd-scenarios`, and hands back with next-step guidance.
+- `bdd-scenarios` skill — Three Amigos session conductor. Loads PRD + ARCHITECTURE (+ parent BDD files if lineage), scopes the session (inherited vs in-scope FRs), facilitates a per-FR interactive session with three question rounds (PM / Dev / QA perspectives), drafts backend and frontend scenarios separately, iterates until user approves, then writes `.bdd/<feature>/BACKEND_FEATURES.md` (API-level Gherkin) and `FRONTEND_FEATURES.md` (UI-level Gherkin) with coverage indexes. Lineage-aware: only runs session for new/modified FRs; inherited FRs get reference comments.
+
+### Changed
+
+- `pm-handoff` — new pre-discipline option "BDD session (optional, pre-discipline)" invokes `bdd-flow` before workstream selection. After the session, user returns to the normal workstream menu. Step 1 optional inputs updated to list BDD feature files.
+- `backend-brief-intake` — new Step 2.6: reads `.bdd/<feature>/BACKEND_FEATURES.md` if present. FR-IDs with matching scenarios are classified as behaviorally specified (✅ clear) without grilling. Grill gate extended: never re-grill FRs covered by BDD scenarios. New Rules bullet.
+- `frontend-brief-intake` — same Step 2.6 pattern, reading `.bdd/<feature>/FRONTEND_FEATURES.md`.
+- `qa-cases` — new Step 1.5 mode detection: if both BDD feature files are present, switches to augment mode (imports FR anchors for coverage matrix, adds edge cases under "Additional edge cases" section, skips scenario rewriting). TEST_CASES.md header gains optional `**Scenario source:**` line. New Rules bullet. Standard mode unchanged when BDD files absent.
+- README: skill count 44 → 46, eight families (added bdd-flow), new "BDD-first workflow" section, `bdd-flow?` in ASCII flow map, `.bdd/<feature>/` in artifacts table.
+- `docs/skills-flow.md`: 44 → 46 in intro, `bdd-flow` node wired into PM flow mermaid with BDD files feeding backend-flow, frontend-flow, and qa-cases.
+
 ## [1.3.0] — 2026-04-22
 
 ### Added
