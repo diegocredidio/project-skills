@@ -1,6 +1,6 @@
 # Skills flow
 
-All 43 skills, their artifacts, and the cross-cutting `PROJECT_PROFILE.md` contract rendered as mermaid diagrams. For a terminal-friendly ASCII view, see the main `README.md`.
+All 44 skills, their artifacts, and the cross-cutting `PROJECT_PROFILE.md` contract rendered as mermaid diagrams. For a terminal-friendly ASCII view, see the main `README.md`.
 
 ---
 
@@ -38,6 +38,9 @@ flowchart TD
 
 ```mermaid
 flowchart LR
+    Extend["pm-extend<br/>evolução lineage"] --> Intake
+    Extend -.writes.-> Parent[("PARENT.md<br/>lineage ledger")]
+    Extend -.copies.-> PP
     Intake["pm-intake<br/>opcional (Path B)"] --> Grill["pm-grill<br/>inclui Delivery profile branch"]
     Start([scratch / Path A]) --> Grill
     Grill --> PRD[pm-prd]

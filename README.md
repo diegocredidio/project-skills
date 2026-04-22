@@ -1,6 +1,6 @@
 # project-skills
 
-**43 skills for Claude Code that take a project from a vague idea to a Jira-backed implementation plan across PM, design, backend, frontend, QA, and Claude Code guardrails — with room to re-run any one phase when a decision changes.**
+**44 skills for Claude Code that take a project from a vague idea to a Jira-backed implementation plan across PM, design, backend, frontend, QA, and Claude Code guardrails — with room to re-run any one phase when a decision changes.**
 
 Inspired by [Julian Oczkowski's designer-skills](https://github.com/julianoczkowski/designer-skills) and [Matt Pocock's skills](https://github.com/mattpocock/skills) — rewritten from scratch, no external runtime dependencies.
 
@@ -11,7 +11,8 @@ Inspired by [Julian Oczkowski's designer-skills](https://github.com/julianoczkow
 Seven families of skills (pm-flow, design-flow, backend-flow, frontend-flow, qa-flow, kanban-flow, cc-flow), each a re-invocable piece of a larger flow:
 
 ```
-pm-flow
+pm-extend? ↘
+             pm-flow
   pm-intake? → pm-grill → pm-prd → pm-architecture
   → pm-workstreams → pm-tasks → pm-review → pm-handoff
                                                ↓
@@ -72,6 +73,20 @@ kanban-flow
   kanban-pickup   (dev picks next card → transition to In Progress + load local spec context)
 ```
 
+### Evolving a feature
+
+When a feature already has a `.pm/<slug>/` folder and you need to plan an improvement or extension, use `pm-extend` instead of starting a new standalone slug:
+
+```
+pm-extend
+  → writes PARENT.md (lineage ledger: parent slug, artifact table, FR-ID baseline)
+  → copies PROJECT_PROFILE.md (inherits designMode / uiFramework / testingRigor)
+  → seeds INTAKE.md (pre-filled with child feature context)
+  → invokes pm-flow (auto-selects Path B — parent context pre-loaded)
+```
+
+`pm-extend` is the only entry point for lineage-aware work. Once it writes `PARENT.md`, every downstream brief-intake skill (`backend-brief-intake`, `frontend-brief-intake`, `design-brief-intake`, `qa-brief-intake`) detects it automatically and loads the parent's artifacts as an inherited baseline — so you never re-litigate stack choices or re-describe existing components. Child FR-IDs continue from `max(parent FR-IDs) + 1` to keep traceability intact across the lineage.
+
 ## Install
 
 Two ways, same repo, no duplication. Pick what fits your setup.
@@ -108,6 +123,7 @@ Every skill reads from and writes to `.<discipline>/<feature>/` in the target re
 
 ```
 .pm/<feature>/
+  ├── PARENT.md              (pm-extend — lineage ledger; triggers lineage-aware mode in downstream skills)
   ├── INTAKE.md              (pm-intake)
   ├── GRILL_SUMMARY.md       (pm-grill)
   ├── PROJECT_PROFILE.md     (pm-grill — designMode + uiFramework + testingRigor; read by 9 downstream skills)
