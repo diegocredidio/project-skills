@@ -38,7 +38,7 @@ If `.pm/<feature>/PARENT.md` exists, this feature is an evolution of a parent sl
 - `.backend/<parent-slug>/BACKEND_DATA.md` — entities, relationships, migration history
 - `.backend/<parent-slug>/BACKEND_API.md` — endpoint inventory, conventions, error format
 
-Treat these as ✅ clear inheritance. In Step 3, mark inherited concerns ✅ with "(inherited from parent)" in the Source column instead of re-classifying. The embedded gap-fill grill (Step 4) then asks only about concerns the child INTRODUCES — not runtime choice, framework, DB engine, auth strategy, or API style when those were resolved in the parent.
+Treat these as ✅ clear inheritance. In Step 3, classify the inherited concerns as ✅ clear — do NOT re-interrogate runtime choice, framework, DB engine, ORM, validation, auth strategy, or API style when those were resolved in the parent. At emission time (Step 6), annotate each inherited concern with "(inherited from parent)" in the Source column of the "What's clear" table. The embedded gap-fill grill (Step 4) asks only about concerns the child INTRODUCES.
 
 Record parent artifact paths in the output's "Parent baseline" section alongside "Codebase reality" — user and downstream skills see both.
 
@@ -68,7 +68,7 @@ For each of these, mark ✅ clear / ⚠️ ambiguous / ❌ missing:
 
 ### Step 4: Embedded gap-fill grill
 
-Ask one question at a time, ordered Critical → Important, **only for items marked ⚠️ or ❌**. Never re-ask ✅ items.
+Ask one question at a time, ordered Critical → Important, **only for items marked ⚠️ or ❌**. Never re-ask ✅ items, and never re-grill concerns that Step 2.5 classified as inherited from the parent.
 
 For each question, offer a default the user can accept with "yes":
 
@@ -90,7 +90,7 @@ If brief + codebase disagree, flag it:
 
 Save to `.backend/<feature>/BACKEND_INTAKE.md`:
 
-**Lineage-only sections:** sections marked with an HTML comment starting `<!-- lineage-only: ... -->` must be emitted ONLY when `.pm/<feature-name>/PARENT.md` exists. If lineage is absent, omit the entire section (comment and heading). When emitting, delete the HTML comment line — it's an authoring marker, not document content.
+**Lineage-only sections:** sections marked with an HTML comment starting `<!-- lineage-only: ... -->` must be emitted ONLY when `.pm/<feature>/PARENT.md` exists. If lineage is absent, omit the entire section (comment and heading). When emitting, delete the HTML comment line — it's an authoring marker, not document content.
 
 ```markdown
 # Backend Intake: [Feature Name]
@@ -157,4 +157,4 @@ Tell the user: "Intake complete. [N] concerns classified, [M] ambiguities resolv
 - If the codebase contradicts the brief on a foundational choice, resolve before proceeding — don't let `backend-stack` inherit the ambiguity.
 - If the brief is thin (< 30 lines), expect the grill to be longer — that's fine.
 - This skill does not make implementation decisions about folder structure or coding conventions. Those belong to `backend-stack`.
-- When `.pm/<feature-name>/PARENT.md` exists, inherit the parent's backend stack/data/API as ✅ clear. Never re-grill runtime, framework, DB, or auth choice if parent already resolved them. New concerns introduced by the evolution are still in scope for the grill.
+- When `.pm/<feature>/PARENT.md` exists, inherit the parent's `BACKEND_STACK.md`, `BACKEND_DATA.md`, and `BACKEND_API.md` as ✅ clear. Never re-grill runtime, framework, DB, ORM, validation, auth strategy, API style, endpoint conventions, or migration history when the parent already resolved them. New concerns introduced by the evolution are still in scope for the grill.
