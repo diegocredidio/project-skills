@@ -34,11 +34,30 @@ Run the complete PM planning process as a guided sequence. Supports two entry pa
 
 Check if `.pm/` directory exists. If not, create it.
 
-Ask: "What feature or project do you want to plan?" Create a subfolder name from the answer (kebab-case).
+Scan `.pm/` for existing slugs. If at least one exists, list them with a short readiness indicator (which artifacts each has) and ask:
 
-If the subfolder already exists, show what's there and ask: "Continue from where you left off, or start fresh?"
+> "Existing features under `.pm/`:
+> - auth (PRD ✓, ARCHITECTURE ✓, handed off)
+> - dashboard (PRD ✓, no handoff yet)
+>
+> Is this a new feature or an evolution of one of those?
+> [new / evolution of <slug> / cancel]"
+
+**If the user picks `evolution of <slug>`**, invoke `pm-extend` with `parent=<slug>`. Ask the user for the child slug name and the improvement summary, then let `pm-extend` run Steps 1–7 and return control here. Do NOT proceed to Step 2 — `pm-extend` ends by invoking `pm-flow` again on the child slug, which will re-enter Step 1 and detect `.pm/<child>/PARENT.md`.
+
+**If the user picks `new`** (or `.pm/` is empty), ask: "What feature or project do you want to plan?" Create a subfolder name from the answer (kebab-case).
+
+**If the subfolder already exists AND contains `PARENT.md`**, skip the existing-material prompt — `PARENT.md` is the existing material. Continue directly to Step 3 in Path B mode.
+
+**If the subfolder already exists WITHOUT `PARENT.md`**, show what's there and ask: "Continue from where you left off, or start fresh?"
 
 ### Step 2: Choose entry point
+
+If `.pm/<feature>/PARENT.md` exists, skip the prompt and go directly to Path B (pm-intake already ran — the seeded INTAKE.md from pm-extend is the "existing material"). Announce:
+
+> "Lineage detected — `<feature>` is an evolution of `<parent>`. Skipping the existing-material prompt and running Path B with the seeded INTAKE.md."
+
+Otherwise:
 
 > "Do you have existing material — a PRD draft, brief, requirements list, or proposal? Or start from scratch?"
 
@@ -100,3 +119,4 @@ Before running `pm-handoff`, confirm:
 - Explore existing codebase before generating anything.
 - On Path B, never re-ask things already resolved in the intake.
 - The handoff step is always last — it needs all PM artifacts to be complete.
+- On evolution (user picked "evolution of <slug>" or `.pm/<feature>/PARENT.md` exists), `pm-extend` owns Step 1's child-bootstrap work and `pm-flow` resumes from Step 2 in Path B mode. Do not re-ask for the parent slug mid-flow.
