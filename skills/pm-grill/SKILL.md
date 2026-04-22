@@ -26,14 +26,17 @@ Use this when `pm-intake` has already run and produced an `INTAKE.md`.
 
 Read `.pm/<feature-name>/INTAKE.md` and extract the "Grill question list" section.
 
-**Lineage check:** if `.pm/<feature-name>/PARENT.md` exists, also read:
+**Lineage check:** if `.pm/<feature-name>/PARENT.md` exists, read the parent slug from its H1 (`# Parent: <parent-slug>`), then also read:
 - `.pm/<parent>/GRILL_SUMMARY.md` (the parent's resolved decisions)
 - `.pm/<parent>/PROJECT_PROFILE.md` (the parent's profile)
 
 Use these as additional ✅ clear context — do NOT re-ask anything the parent already resolved. If the child's INTAKE already flagged an item as inherited, respect that and skip.
 
-Tell the user:
-> "I've reviewed your document. [N] things are already clear (including [K] inherited from parent `<parent>`, if applicable). I have [N critical + N important] questions to work through with you. Let's go."
+Tell the user. If `PARENT.md` exists, say:
+> "I've reviewed your document. [N] things are already clear (including [K] inherited from parent `<parent>`). I have [N critical + N important] questions to work through with you. Let's go."
+
+Otherwise say:
+> "I've reviewed your document. [N] things are already clear. I have [N critical + N important] questions to work through with you. Let's go."
 
 Do NOT re-ask or re-verify the elements marked ✅ Clear in the intake, nor anything in the parent's GRILL_SUMMARY. Respect the user's existing work.
 
