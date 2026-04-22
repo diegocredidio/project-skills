@@ -31,6 +31,20 @@ Read:
 - **Fixture directories:** `__fixtures__/`, `tests/fixtures/`, `seeds/`, `factories/`
 - Existing test file counts by type (unit / integration / E2E, inferred from filename patterns like `*.test.*`, `*.spec.*`, `*.e2e.*`, `tests/integration/`)
 
+### Step 2.5: Parent artifact read (lineage-only)
+
+If `.pm/<feature>/PARENT.md` exists, this feature is an evolution of a parent slug. Read the parent slug from `PARENT.md`'s H1 (`# Parent: <parent-slug>`), then also read:
+- `.qa/<parent-slug>/QA_STRATEGY.md` — pyramid, tools, coverage targets, risk matrix
+- `.qa/<parent-slug>/TEST_CASES.md` — existing Gherkin cases (parent TCs remain covered; child adds net-new TCs)
+
+Treat these as ✅ clear inheritance. In Step 3, classify the inherited concerns as ✅ clear — do NOT re-interrogate test frameworks (unit / integration / E2E), mocking strategy, coverage tooling, coverage targets, a11y tooling, perf tooling, visual regression tooling, or bug-tracker integration when the parent already resolved them. At emission time (the step that writes the intake document), annotate each inherited concern with "(inherited from parent)" in the Source column of the output. Child QA strategy is additive — new TCs cover evolution-specific behaviors; do not duplicate parent TCs. If the child touches behavior covered by a parent TC, add a regression note instead.
+
+Record parent artifact paths in the output's "Parent QA baseline" section alongside the codebase-reality section.
+
+If the parent folder is missing any of the two files, proceed with what's available and note the absence.
+
+If `PARENT.md` does not exist, skip this step and continue to Step 3 in standalone mode.
+
 ### Step 3: Classify every QA concern
 
 For each of these, mark ✅ clear / ⚠️ ambiguous / ❌ missing:
@@ -50,7 +64,7 @@ For each of these, mark ✅ clear / ⚠️ ambiguous / ❌ missing:
 
 ### Step 4: Run gap-fill grill
 
-Ask one question at a time, ordered Critical → Important, **only for items marked ⚠️ or ❌**. Never re-ask ✅ items.
+Ask one question at a time, ordered Critical → Important, **only for items marked ⚠️ or ❌**. Never re-ask ✅ items, and never re-grill concerns that Step 2.5 classified as inherited from the parent.
 
 For each question, offer a default the user can accept with "yes":
 
@@ -66,6 +80,8 @@ If the user answers vaguely, probe with "concretely, which?" — don't accept "w
 ### Step 5: Write QA_INTAKE.md
 
 Save to `.qa/<feature>/QA_INTAKE.md`:
+
+**Lineage-only sections:** sections marked with an HTML comment starting `<!-- lineage-only: ... -->` must be emitted ONLY when `.pm/<feature>/PARENT.md` exists. If lineage is absent, omit the entire section (comment and heading). When emitting, delete the HTML comment line — it's an authoring marker, not document content.
 
 ```markdown
 # QA Intake: [Feature/Project Name]
@@ -91,6 +107,16 @@ Save to `.qa/<feature>/QA_INTAKE.md`:
 
 **What's missing:**
 - [e.g. no a11y tooling, no visual regression, no perf harness]
+
+<!-- lineage-only: emit this entire section ONLY when PARENT.md exists; delete this comment on emit -->
+## Parent QA baseline
+
+| Artifact | Path | Key inheritance |
+|----------|------|-----------------|
+| QA strategy | .qa/<parent-slug>/QA_STRATEGY.md | [one-line summary of inherited pyramid, tools, coverage targets, risk matrix] |
+| Test cases | .qa/<parent-slug>/TEST_CASES.md | [one-line summary of TC counts by level (journey/component/API/NFR) inherited from parent] |
+
+**Inheritance note:** the child QA strategy must use the same test frameworks and coverage tooling as the parent unless there is an explicit reason to differ — document any divergence in the strategy's Deferred decisions section.
 
 ## Classification
 
@@ -136,3 +162,4 @@ Tell the user: "Intake done. Next: `qa-strategy` will use this + `testingRigor` 
 - Never guess a testing tool — audit the codebase first; only propose defaults after the audit proves a gap.
 - Never decide the strategy here. Framework trade-offs, test-pyramid shape, and per-layer targets belong to `qa-strategy`.
 - Output is markdown only — never write to the user's source tree, never install deps, never scaffold test files.
+- When `.pm/<feature>/PARENT.md` exists, inherit the parent's `QA_STRATEGY.md` and `TEST_CASES.md` as ✅ clear. Never re-grill test frameworks, mocking strategy, coverage tooling, coverage targets, a11y tooling, perf tooling, visual regression tooling, or bug-tracker when the parent already resolved them. Child TCs are additive — do not duplicate parent TCs. If the child touches behavior covered by a parent TC, add a regression note instead.
