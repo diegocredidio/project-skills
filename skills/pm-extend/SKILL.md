@@ -13,7 +13,7 @@ Materialize a child slug that inherits from a parent slug. Single responsibility
 
 Gather three values — ask one at a time if missing:
 
-1. **Parent slug** — must exist at `.pm/<parent>/`. If user didn't supply, ask: "Which existing feature are you evolving? Available: [list of `.pm/*` subdirectories]."
+1. **Parent slug** — must exist at `.pm/<parent>/`. If user didn't supply, first enumerate available slugs by listing `.pm/*` subdirectories, then ask: "Which existing feature are you evolving? Available: [enumerated list]."
 2. **Child slug** — kebab-case name for the new feature. Offer a default derived from the user's improvement description (e.g., "add 2FA to auth" → suggest `2fa`). Ask: "Child slug `<suggested>`? Or rename."
 3. **Improvement summary** — 1–5 sentence paragraph. Ask: "Describe what this evolution adds or changes vs. the parent."
 
@@ -21,11 +21,11 @@ Gather three values — ask one at a time if missing:
 
 Abort with a precise message on any of:
 
-- Parent does not exist at `.pm/<parent>/` → "No slug `<parent>` under `.pm/`. Available: [list]. Maybe you meant pm-flow for a greenfield slug?"
+- Parent does not exist at `.pm/<parent>/` → "No slug `<parent>` under `.pm/`. Available: [enumerated list from `.pm/*`]. Maybe you meant pm-flow for a greenfield slug?"
 - Child slug is not kebab-case → "Child slug must be kebab-case (lowercase, hyphens). Got: `<value>`."
 - Child slug would collide with `.pm/<child>/` that already exists → prompt: "`.pm/<child>/` already exists. Options: [continue] (keep folder, only add/update PARENT.md + profile), [rename] (new slug), [abort]."
 
-On `continue` with an existing folder, skip Step 4 for INTAKE.md — only write PARENT.md and PROJECT_PROFILE.md.
+On `continue` with an existing folder, skip Step 7 (INTAKE.md seeding) — only write PARENT.md and PROJECT_PROFILE.md.
 
 ### Step 3: Audit parent artifacts
 
@@ -47,7 +47,11 @@ If `PRD.md` and `ARCHITECTURE.md` are both absent, warn: "Parent `<parent>` has 
 
 ### Step 4: Resolve profile inheritance
 
-Read `.pm/<parent>/PROJECT_PROFILE.md`. If missing, tell the user: "Parent has no PROJECT_PROFILE.md — can't inherit. Fill it now for the parent via pm-grill Step 1.5 prompt, OR fill the child's profile from scratch?" Proceed based on choice.
+Read `.pm/<parent>/PROJECT_PROFILE.md`. If missing, tell the user:
+
+> "Parent has no PROJECT_PROFILE.md — can't inherit. Fill the child's profile from scratch? designMode: **shadcn-theme** or **custom-system**? uiFramework: **shadcn/ui**, **<other>**, or **none**? testingRigor: **mvp** or **full**?"
+
+Write the child's PROJECT_PROFILE.md directly with the answers and continue. Do not attempt to backfill the parent's profile from here — that is not pm-extend's job.
 
 If present, default to inheriting verbatim. Prompt once:
 
@@ -57,7 +61,7 @@ On `n`, walk each of the three fields — for each: "Keep `<parent-value>` or ch
 
 ### Step 5: Write PARENT.md
 
-Save to `.pm/<child>/PARENT.md`:
+Save to `.pm/<child>/PARENT.md`. Include only the rows where the parent actually has the file (from the Step 3 audit) — drop rows for missing artifacts:
 
 ```markdown
 # Parent: <parent-slug>
@@ -79,7 +83,7 @@ Save to `.pm/<child>/PARENT.md`:
 | .frontend/<parent>/FRONTEND_ROUTES.md | Route map the child may extend (if present) |
 | .design/<parent>/COMPONENT_SPECS.md | Component inventory the child may reuse (if present) |
 
-Include only the rows where the parent actually has the file. Drop rows for missing artifacts.
+**FR-ID baseline:** <max FR-XXX in parent's PRD.md; pm-prd reads this to continue numbering in the child>
 
 ## Profile inheritance
 
@@ -123,6 +127,8 @@ Pull the following verbatim from parent artifacts and list here so pm-grill can 
 - Target users: <from .pm/<parent>/GRILL_SUMMARY.md "Target Users" section>
 - Stack: <from .pm/<parent>/ARCHITECTURE.md "Stack Decisions" table — one-line summary>
 - Profile: designMode=<value>, uiFramework=<value>, testingRigor=<value>
+
+Match section headings loosely. "Problem Statement" may also appear as "Problem", "Overview", or "Context" across pack versions. "Target Users" may appear as "Users" or "Primary Users". "Stack Decisions" may appear as "Stack" or "Technology Stack". Use the closest match; never invent content.
 
 If a source file is missing, write "(parent has no <section>)" instead of inventing content.
 
@@ -175,7 +181,7 @@ Invoke `pm-flow` with the child slug. Do not restart the grill here; pm-flow's S
 - Never overwrite `.pm/<child>/INTAKE.md` if the child folder already existed before this invocation (continue-mode) — only PARENT.md and PROJECT_PROFILE.md are safe to refresh.
 - Never read parent code or parent PR history — only the `.pm/<parent>/` + discipline folder artifacts. This skill is spec-aware, not code-aware.
 - Never invent parent artifacts. If `.pm/<parent>/PRD.md` is missing, leave the corresponding "Inherited from parent" bullet blank and flag the gap.
-- FR-IDs in the child's eventual PRD continue from `max(parent FR-XXX) + 1` — but that's pm-prd's job, not this skill's. Just note it in PARENT.md for pm-prd to read.
-- Lineage is flat. If the user tries to extend an already-extended slug, allow it mechanically (parent has its own PARENT.md, which this skill ignores), but do NOT chain references. Document multi-level gap in Decision 9 of the design doc.
+- FR-IDs in the child's eventual PRD continue from `max(parent FR-XXX) + 1` — that's pm-prd's job, not this skill's. pm-extend records the baseline in PARENT.md's `**FR-ID baseline:**` line during Step 5; pm-prd reads it to continue numbering.
+- Lineage is flat. If the user tries to extend an already-extended slug, treat the target slug as a flat parent — ignore the target's own PARENT.md, and do not chain references across grandparents.
 - Profile changes (override mode) are recorded with a reason in PARENT.md. Silent overrides are a footgun.
 - This skill always ends by invoking pm-flow. Do not produce a standalone "done" state — the flow continues.
