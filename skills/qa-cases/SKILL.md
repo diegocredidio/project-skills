@@ -17,8 +17,22 @@ Read:
 - `.qa/<feature>/QA_STRATEGY.md` — for pyramid decisions and tool choices (so cases land on the right layer)
 - `.design/<feature>/COMPONENT_SPECS.md` (optional) — for a11y requirements per interactive component
 - `.backend/<feature>/BACKEND_API.md` (optional) — for endpoint contracts to drive API-level cases
+- `.bdd/<feature>/BACKEND_FEATURES.md` (optional) — pre-agreed backend scenarios from Three Amigos session
+- `.bdd/<feature>/FRONTEND_FEATURES.md` (optional) — pre-agreed frontend scenarios from Three Amigos session
 
 If PRD.md or QA_STRATEGY.md is missing, abort and direct the user to run the missing predecessor. If PROJECT_PROFILE.md is missing, fall back to the standard migration prompt (ask `designMode` and `testingRigor`).
+
+### Step 1.5: Detect mode
+
+If `.bdd/<feature>/BACKEND_FEATURES.md` AND `.bdd/<feature>/FRONTEND_FEATURES.md` both exist:
+→ **Augment mode.** Scenarios are already written by the Three Amigos session. Skip Step 4 (Write Gherkin scenarios).
+  - Import FR-ID anchors from both files to build the coverage matrix (Step 5)
+  - Add edge cases and negative cases not already covered in the BDD files (append to TEST_CASES.md under a dedicated "## Additional edge cases" section)
+  - Write flakiness notes as usual (Step 6)
+  - In TEST_CASES.md header, note: `**Scenario source:** bdd-flow Three Amigos session`
+
+If BDD files are absent (or only one is present):
+→ **Standard mode.** Continue with Steps 2–8 as written.
 
 ### Step 2: Scope cases to testingRigor
 
@@ -136,6 +150,7 @@ Save to `.qa/<feature>/TEST_CASES.md`:
 
 **testingRigor:** [mvp | full]
 **Source:** PRD.md, QA_STRATEGY.md, COMPONENT_SPECS.md
+**Scenario source:** [bdd-flow Three Amigos session | derived from PRD + QA_STRATEGY]
 **Date:** [YYYY-MM-DD]
 
 ## Coverage matrix
@@ -259,3 +274,4 @@ Tell the user: "Cases written. Next: `qa-tasks` decomposes these into vertical s
 - Markdown-only output. This skill does not write test code into the source tree — that's `qa-tasks` and external implementation.
 - Never invent FR-XXX that aren't in the PRD. If a case feels necessary but no FR maps to it, flag it in the coverage matrix as an uncovered concern and ask PM to add the FR.
 - Flag fragile selectors proactively in the Flakiness notes section. Silent adoption of brittle patterns is the main cause of flaky test suites.
+- If BDD feature files exist in `.bdd/<feature>/`, switch to augment mode and never rewrite their scenarios — augmenting pre-agreed scenarios breaks the Three Amigos contract.
