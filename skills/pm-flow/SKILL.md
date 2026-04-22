@@ -34,22 +34,27 @@ Run the complete PM planning process as a guided sequence. Supports two entry pa
 
 Check if `.pm/` directory exists. If not, create it.
 
-Scan `.pm/` for existing slugs. If at least one exists, list them with a short readiness indicator (which artifacts each has) and ask:
+Scan `.pm/` for existing slugs. For each existing slug, compute a readiness indicator by checking:
+- `PRD.md` — present in `.pm/<slug>/` → emit `PRD ✓`
+- `ARCHITECTURE.md` — present in `.pm/<slug>/` → emit `ARCHITECTURE ✓`
+- Any of `.design/<slug>/DESIGN_BRIEF.md`, `.backend/<slug>/BACKEND_BRIEF.md`, `.frontend/<slug>/FRONTEND_BRIEF.md`, `.qa/<slug>/QA_BRIEF.md` → emit `handed off`
+
+If at least one slug exists, list each with its readiness indicator and ask (showing one `evolution of <slug>` option per enumerated slug — not a literal `<slug>` placeholder):
 
 > "Existing features under `.pm/`:
 > - auth (PRD ✓, ARCHITECTURE ✓, handed off)
 > - dashboard (PRD ✓, no handoff yet)
 >
 > Is this a new feature or an evolution of one of those?
-> [new / evolution of <slug> / cancel]"
+> [new / evolution of auth / evolution of dashboard / cancel]"
 
-**If the user picks `evolution of <slug>`**, invoke `pm-extend` with `parent=<slug>`. Ask the user for the child slug name and the improvement summary, then let `pm-extend` run Steps 1–7 and return control here. Do NOT proceed to Step 2 — `pm-extend` ends by invoking `pm-flow` again on the child slug, which will re-enter Step 1 and detect `.pm/<child>/PARENT.md`.
+**If the user picks `evolution of <slug>`**, invoke `pm-extend` with `parent=<slug>`. Ask the user for the child slug name and the improvement summary, then let `pm-extend` run its full flow (Steps 1–8). pm-extend ends by invoking `pm-flow` on the child slug, which re-enters this Step 1 and matches the "subfolder exists with PARENT.md" branch below. Do NOT proceed to Step 2 in the current invocation.
 
-**If the user picks `new`** (or `.pm/` is empty), ask: "What feature or project do you want to plan?" Create a subfolder name from the answer (kebab-case).
+**If the user picks `new`** (or `.pm/` is empty), ask: "What feature or project do you want to plan?" Create a subfolder name from the answer (kebab-case). Then check the subfolder state:
 
-**If the subfolder already exists AND contains `PARENT.md`**, skip the existing-material prompt — `PARENT.md` is the existing material. Continue directly to Step 3 in Path B mode.
-
-**If the subfolder already exists WITHOUT `PARENT.md`**, show what's there and ask: "Continue from where you left off, or start fresh?"
+- **Subfolder exists AND contains `PARENT.md`** → skip the existing-material prompt and continue to Step 2 — the `PARENT.md` check there will auto-select Path B.
+- **Subfolder exists WITHOUT `PARENT.md`** → show what's there and ask: "Continue from where you left off, or start fresh?"
+- **Subfolder does not exist** → create it and continue to Step 2.
 
 ### Step 2: Choose entry point
 
