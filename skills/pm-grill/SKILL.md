@@ -26,10 +26,16 @@ Use this when `pm-intake` has already run and produced an `INTAKE.md`.
 
 Read `.pm/<feature-name>/INTAKE.md` and extract the "Grill question list" section.
 
-Tell the user:
-> "I've reviewed your document. [N] things are already clear. I have [N critical + N important] questions to work through with you. Let's go."
+**Lineage check:** if `.pm/<feature-name>/PARENT.md` exists, also read:
+- `.pm/<parent>/GRILL_SUMMARY.md` (the parent's resolved decisions)
+- `.pm/<parent>/PROJECT_PROFILE.md` (the parent's profile)
 
-Do NOT re-ask or re-verify the elements marked ✅ Clear in the intake. Respect the user's existing work.
+Use these as additional ✅ clear context — do NOT re-ask anything the parent already resolved. If the child's INTAKE already flagged an item as inherited, respect that and skip.
+
+Tell the user:
+> "I've reviewed your document. [N] things are already clear (including [K] inherited from parent `<parent>`, if applicable). I have [N critical + N important] questions to work through with you. Let's go."
+
+Do NOT re-ask or re-verify the elements marked ✅ Clear in the intake, nor anything in the parent's GRILL_SUMMARY. Respect the user's existing work.
 
 ### Step A2: Ask only the flagged questions
 
@@ -196,3 +202,4 @@ If the user didn't resolve the Delivery profile branch (gap-fill mode where the 
 - If something can be answered by exploring the codebase, explore it instead of asking.
 - Offer a recommended answer when the user is stuck — give them something to react to.
 - The grill summary is the source of truth for all downstream skills. Make it complete.
+- When `.pm/<feature>/PARENT.md` exists, treat the parent's `GRILL_SUMMARY.md` as ✅ clear context. Re-asking parent-resolved questions wastes the user's time and defeats the purpose of lineage.
