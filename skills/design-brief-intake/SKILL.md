@@ -39,6 +39,21 @@ Search for and read:
 
 Record findings as a structured inventory.
 
+### Step 2.5: Parent artifact read (lineage-only)
+
+If `.pm/<feature>/PARENT.md` exists, this feature is an evolution of a parent slug. Read the parent slug from `PARENT.md`'s H1 (`# Parent: <parent-slug>`), then also read:
+- `.design/<parent-slug>/TOKENS.md` — color/spacing/radius/typography tokens
+- `.design/<parent-slug>/COMPONENT_SPECS.md` — component inventory and per-component specs
+- `.design/<parent-slug>/IA.md` — information architecture, page hierarchy
+
+Treat these as ✅ clear inheritance. In Step 3, classify the inherited items as ✅ clear — do NOT re-pick tokens (colors, spacing, radii, typography) or re-spec components that the parent already resolved. At emission time (the step that writes the enriched brief), annotate each inherited item with "(inherited from parent)" in the "Existing patterns" section (or equivalent) of the output. Child brief adds only net-new tokens, components, or IA structure the improvement genuinely requires.
+
+Record parent artifact paths in the output's "Parent baseline" section alongside the existing-patterns section.
+
+If the parent folder is missing any of the three files, proceed with what's available and note the absence.
+
+If `PARENT.md` does not exist, skip this step and continue to Step 3 in standalone mode.
+
 ### Step 3: Gap analysis
 
 Compare what the brief declares against what the codebase already has. Classify every design concern as:
@@ -52,6 +67,8 @@ Surface conflicts directly (e.g., "Brief says dark-mode-first but codebase has n
 ### Step 4: Enrich the brief
 
 Write an expanded `DESIGN_BRIEF.md` that includes the original content plus these new sections:
+
+**Lineage-only sections:** sections marked with an HTML comment starting `<!-- lineage-only: ... -->` must be emitted ONLY when `.pm/<feature>/PARENT.md` exists. If lineage is absent, omit the entire section (comment and heading). When emitting, delete the HTML comment line — it's an authoring marker, not document content.
 
 ```markdown
 # Design Brief: [Feature Name]
@@ -80,6 +97,15 @@ Write an expanded `DESIGN_BRIEF.md` that includes the original content plus thes
 - Dark mode: [next-themes configured / none]
 - Fonts: [Inter via next/font / system stack]
 - Breakpoints: [sm 640 / md 768 / lg 1024 / xl 1280]
+
+<!-- lineage-only: emit this entire section ONLY when PARENT.md exists; delete this comment on emit -->
+## Parent design baseline
+
+| Artifact | Path | Key inheritance |
+|----------|------|-----------------|
+| Tokens | .design/<parent-slug>/TOKENS.md | [one-line summary of inherited colors, radius, typography, spacing] |
+| Component inventory | .design/<parent-slug>/COMPONENT_SPECS.md | [one-line summary of inherited components and their sourcing — shadcn / custom / Radix-on-top] |
+| Information architecture | .design/<parent-slug>/IA.md | [one-line summary of inherited page hierarchy and navigation] |
 
 ## Component inventory
 | Component | Status (reuse / modify / new) | Notes |
@@ -145,3 +171,4 @@ Tell the user:
 - If the codebase audit finds a design system already in place, downstream skills must respect it (no regenerating tokens that already exist in `tailwind.config.ts`).
 - Conflicts between brief and codebase are not errors — they're design decisions to surface, not hide.
 - If the original brief was thin (< 20 lines), flag it: "The brief is sparse — expect design-ia and design-tokens to ask follow-up questions."
+- When `.pm/<feature>/PARENT.md` exists, inherit the parent's `TOKENS.md`, `COMPONENT_SPECS.md`, and `IA.md` as ✅ clear. Never re-pick tokens (colors, spacing, radii, typography) or re-spec components the parent already resolved — reuse before recreating. New components and IA structure enter the inventory only when the evolution genuinely adds net-new functionality.
