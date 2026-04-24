@@ -9,10 +9,16 @@ All 46 skills, their artifacts, and the cross-cutting `PROJECT_PROFILE.md` contr
 ```mermaid
 flowchart TD
     Start([Idea or PRD draft]) --> PM[pm-flow]
-    PM -->|pm-handoff| Design[design-flow]
-    PM -->|pm-handoff| Backend[backend-flow]
-    PM -->|pm-handoff| Frontend[frontend-flow]
-    PM -->|pm-handoff| QA[qa-flow]
+    PM -->|pm-handoff| Handoff[pm-handoff]
+    Handoff -->|opcional| BDD[bdd-flow]
+    BDD --> BDDFiles[".bdd/&lt;feature&gt;/<br/>BACKEND_FEATURES.md<br/>FRONTEND_FEATURES.md"]
+    Handoff --> Design[design-flow]
+    Handoff --> Backend[backend-flow]
+    Handoff --> Frontend[frontend-flow]
+    Handoff --> QA[qa-flow]
+    BDDFiles -.contratos Gherkin.-> Backend
+    BDDFiles -.contratos Gherkin.-> Frontend
+    BDDFiles -.augment qa-cases.-> QA
     Design -.specs upstream.-> Frontend
     Backend -.API contracts.-> Frontend
     Design --> Build1[implementação]
@@ -28,9 +34,11 @@ flowchart TD
     Backend -.BACKEND_TASKS.md.-> Kanban
     Frontend -.FRONTEND_TASKS.md.-> Kanban
     QA -.QA_TASKS.md.-> Kanban
-    PM -->|pm-handoff| CC[cc-flow]
+    Handoff -->|opcional| CC[cc-flow]
     CC --> Agents[".claude/agents/&lt;feature&gt;/"]
 ```
+
+`bdd-flow` é opcional: equipes sem BDD seguem direto de `pm-handoff` para os fluxos por disciplina. Quando roda, fica **depois** do handoff e **antes** da implementação paralela — alinhado ao contrato comportamental na secção [BDD flow](#bdd-flow-opcional).
 
 ---
 
@@ -64,6 +72,41 @@ flowchart LR
 
 ---
 
+## BDD flow (opcional)
+
+Fluxo **BDD-first** para quem quer cenários Gherkin acordados (Three Amigos: PM + Dev + QA) **por FR**, antes de backend e frontend implementarem em paralelo.
+
+**Quando entra:** depois de `pm-handoff` (e tipicamente depois de `pm-architecture` no próprio `pm-flow`) e **antes** dos fluxos por disciplina — o ramo opcional no diagrama [PM flow](#pm-flow) sai do `pm-handoff`.
+
+**O que escreve** (em `.bdd/<feature>/`):
+
+| Arquivo | Conteúdo | Leitores |
+| --- | --- | --- |
+| `BACKEND_FEATURES.md` | Gherkin ao nível de API | `backend-brief-intake` |
+| `FRONTEND_FEATURES.md` | Gherkin ao nível de UI | `frontend-brief-intake`, `qa-cases` |
+
+**Comportamento quando os ficheiros existem:**
+
+- `backend-brief-intake` trata `BACKEND_FEATURES.md` como contratos comportamentais pré-acordados — cenários alinhados contam como claros sem novo “grill”.
+- `frontend-brief-intake` faz o mesmo com `FRONTEND_FEATURES.md`.
+- `qa-cases` entra em **modo augment**: importa âncoras FR dos dois ficheiros para a matriz de cobertura e acrescenta edge cases, em vez de inventar cenários de raiz.
+
+**Lineage (`pm-extend`):** se a feature veio de extensão, `bdd-flow` carrega os BDD do parent como baseline e corre Three Amigos só para FRs novos ou alterados.
+
+```mermaid
+flowchart LR
+    Handoff[pm-handoff] -->|opcional| BDD[bdd-flow]
+    BDD --> T3["Three Amigos<br/>por FR"]
+    T3 --> BE["BACKEND_FEATURES.md<br/>API Gherkin"]
+    T3 --> FE["FRONTEND_FEATURES.md<br/>UI Gherkin"]
+    BE --> BI[backend-brief-intake]
+    FE --> FI[frontend-brief-intake]
+    BE --> QC[qa-cases]
+    FE --> QC
+```
+
+---
+
 ## Design flow (com designMode branching)
 
 ```mermaid
@@ -90,6 +133,7 @@ Path B (sem DESIGN_BRIEF.md do pm-handoff): roda `design-grill` antes de `design
 ```mermaid
 flowchart LR
     Flow[backend-flow] --> Brief[backend-brief-intake]
+    BDDIn[(".bdd/&lt;feature&gt;/<br/>BACKEND_FEATURES.md")] -.se existir.-> Brief
     Brief --> Stack[backend-stack]
     Stack --> Data[backend-data]
     Data --> API[backend-api]
@@ -105,6 +149,7 @@ flowchart LR
 ```mermaid
 flowchart TD
     Flow[frontend-flow] --> FBrief[frontend-brief-intake]
+    BDDIn[(".bdd/&lt;feature&gt;/<br/>FRONTEND_FEATURES.md")] -.se existir.-> FBrief
     FBrief --> FStack["frontend-stack<br/>lê PROJECT_PROFILE.md<br/>aborta se designMode=shadcn-theme<br/>mas Component library ≠ shadcn/ui"]
     FStack --> FRoute[frontend-routing]
     FRoute --> FMode{designMode?}
@@ -129,6 +174,7 @@ flowchart TD
     Mode -->|full| StratFull["qa-strategy<br/>full pyramid<br/>coverage targets (80% lines / 70% branches)<br/>todos FR-XXX"]
     StratSlim --> Cases[qa-cases]
     StratFull --> Cases
+    BDDIn[(".bdd/&lt;feature&gt;/<br/>BACKEND + FRONTEND<br/>FEATURES.md")] -.augment se existir.-> Cases
     Cases --> QTasks[qa-tasks]
     QTasks --> Build[build]
     Build --> Review[qa-review]
@@ -205,6 +251,7 @@ Projetos legados sem o arquivo: os três pontos de fallback-prompt (`pm-handoff`
 
 | Disciplina | Pasta | Arquivos |
 |---|---|---|
+| BDD | `.bdd/<feature>/` | `BACKEND_FEATURES.md` (bdd-flow — Gherkin API; lido por `backend-brief-intake`), `FRONTEND_FEATURES.md` (bdd-flow — Gherkin UI; lido por `frontend-brief-intake` e `qa-cases` em augment mode) |
 | PM | `.pm/<feature>/` | `INTAKE.md`, `GRILL_SUMMARY.md`, **`PROJECT_PROFILE.md`**, `PRD.md`, `ARCHITECTURE.md`, `WORKSTREAMS.md`, `TASKS.md`, `REVIEW.md`, `JIRA_MAP.md` |
 | Design | `.design/<feature>/` | `DESIGN_GRILL.md` (Path B), `DESIGN_BRIEF.md`, `CODEBASE_AUDIT.md`, `IA.md`, `TOKENS.md` (slim ou full conforme modo), `COMPONENT_SPECS.md` (screen-centric ou full conforme modo), `DESIGN_TASKS.md`, `DESIGN_REVIEW.md`, `screenshots/` |
 | Backend | `.backend/<feature>/` | `BACKEND_BRIEF.md`, `BACKEND_INTAKE.md`, `BACKEND_STACK.md`, `BACKEND_DATA.md`, `BACKEND_API.md`, `BACKEND_TASKS.md`, `BACKEND_REVIEW.md` |

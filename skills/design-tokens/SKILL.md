@@ -1,6 +1,6 @@
 ---
 name: design-tokens
-description: Reads `.design/<feature>/DESIGN_BRIEF.md` and `CODEBASE_AUDIT.md` and produces `.design/<feature>/TOKENS.md` — the canonical visual token system (color scales, spacing, typography, radius, motion, breakpoints). Dark-first by default, light as variation. Emits spec in markdown plus fenced code snippets in the project's format (CSS vars / Tailwind config / theme.ts) — does not write code into the user's source tree. Use when design-flow invokes it or when user says "design tokens", "generate the token system", "build the color palette". Not for component-level styling decisions (that's design-components) or general color-theory consulting.
+description: Reads `.design/<feature>/DESIGN_BRIEF.md` and `CODEBASE_AUDIT.md` and produces `.design/<feature>/TOKENS.md` — the canonical visual token system (Brand & Style preamble, color scales, spacing, typography, radius, motion, elevation & depth, breakpoints, plus Do's and Don'ts guardrails). Dark-first by default, light as variation; elevation supports shadow-based, tonal-layers, or glass-blur strategies. Emits spec in markdown plus fenced code snippets in the project's format (CSS vars / Tailwind config / theme.ts) — does not write code into the user's source tree. Use when design-flow invokes it or when user says "design tokens", "generate the token system", "build the color palette". Not for component-level styling decisions (that's design-components) or general color-theory consulting.
 ---
 
 # Design Tokens — Visual System Specification
@@ -19,7 +19,7 @@ Read:
 
 ### Step 1.5: Branch on designMode
 
-- **`designMode: shadcn-theme`** → skip Steps 5, 6, 7 (spacing scale, typography scale, radius/motion/breakpoints/z-index). Go to the **Shadcn-theme mode** section at the end of this skill. The canonical output in that mode is a slim TOKENS.md with theme vars + radius + font only.
+- **`designMode: shadcn-theme`** → skip Steps 5, 6, 7 (spacing scale, typography scale, radius/motion/elevation/breakpoints/z-index). Go to the **Shadcn-theme mode** section at the end of this skill. The canonical output in that mode is a slim TOKENS.md with theme vars + radius + font + minimal elevation + do's and don'ts.
 - **`designMode: custom-system`** → follow Steps 2–9 as written (full token system).
 
 ### Step 2: Decide the target code format
@@ -80,13 +80,31 @@ Use `clamp()` for mobile-first fluid sizes:
 
 Declare the font stack (primary, monospace, fallback) based on the brief.
 
-### Step 7: Build radius, motion, breakpoints
+### Step 7: Build radius, motion, elevation, breakpoints
 
 - **Radius:** `none (0), sm (4), md (8), lg (12), xl (16), 2xl (24), full (9999)`
 - **Motion durations:** `fast (100ms), base (150ms), slow (250ms), slower (400ms)`
 - **Motion easing:** `ease-out (default), ease-in-out (layout), spring` — define `cubic-bezier` values
 - **Breakpoints:** `sm 375, md 768, lg 1024, xl 1280, 2xl 1440` (mobile-first min-width queries)
 - **Z-index:** `base (0), sticky (10), dropdown (20), overlay (30), modal (40), popover (50), toast (60)`
+- **Elevation & depth:** decide the hierarchy strategy based on the brief — pick ONE primary approach and describe fallbacks if used together. Output a scale with at least 4 levels.
+
+  **Strategies (pick one primary):**
+  - **Shadow-based** (default for most UIs) — stacked shadows with growing y-offset, spread, and blur. Every level has a dark and light value (shadows are less visible in dark mode and usually need higher opacity).
+  - **Tonal layers** (flat / material-you style) — surface color shifts (`surface`, `surface-subtle`, `surface-elevated`, `surface-overlay` from Step 4) convey hierarchy without shadows. Document the mapping explicitly.
+  - **Glass / backdrop-blur** (glassmorphism) — `backdrop-filter: blur(Npx)` + translucent background + 1px light border. Define blur levels and border alphas.
+
+  **Required tokens per level** (regardless of strategy): `elevation-0` (flat/base), `elevation-1` (card resting), `elevation-2` (raised card / dropdown), `elevation-3` (modal / popover), `elevation-4` (toast / top-most).
+
+  **Shadow scale defaults** (when strategy = shadow-based):
+
+  | Level | Dark value | Light value |
+  |-------|------------|-------------|
+  | `elevation-0` | `none` | `none` |
+  | `elevation-1` | `0 1px 2px 0 rgb(0 0 0 / 0.6)` | `0 1px 2px 0 rgb(0 0 0 / 0.05)` |
+  | `elevation-2` | `0 4px 8px -2px rgb(0 0 0 / 0.6), 0 2px 4px -2px rgb(0 0 0 / 0.4)` | `0 4px 8px -2px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.06)` |
+  | `elevation-3` | `0 12px 24px -6px rgb(0 0 0 / 0.7), 0 8px 16px -4px rgb(0 0 0 / 0.5)` | `0 12px 24px -6px rgb(0 0 0 / 0.12), 0 8px 16px -4px rgb(0 0 0 / 0.08)` |
+  | `elevation-4` | `0 24px 48px -12px rgb(0 0 0 / 0.8)` | `0 24px 48px -12px rgb(0 0 0 / 0.18)` |
 
 ### Step 8: Write TOKENS.md
 
@@ -97,6 +115,10 @@ Save to `.design/<feature>/TOKENS.md`:
 
 **Target format:** [Tailwind + shadcn CSS vars / theme.ts / plain CSS]
 **Dark mode:** dark-first, light as variation
+
+## Brand & Style
+
+[2–4 sentences describing the aesthetic intent behind these tokens — brand personality, emotional response, density, reference vibe. Pulled from DESIGN_BRIEF.md's "Aesthetic direction" section, condensed. This preamble tells downstream agents WHY the palette leans dark / muted / vibrant / glass, so they can judge edge cases the tokens don't cover explicitly.]
 
 ## Color system
 
@@ -130,6 +152,22 @@ Save to `.design/<feature>/TOKENS.md`:
 ## Radius / motion / breakpoints / z-index
 
 [Tables above]
+
+## Elevation & depth
+
+**Strategy:** [shadow-based / tonal-layers / glass-blur] — [one sentence on why, tied to the Brand & Style preamble]
+
+| Token | Role | Dark value | Light value |
+|-------|------|------------|-------------|
+| `elevation-0` | flat / base surface | ... | ... |
+| `elevation-1` | resting card, list row | ... | ... |
+| `elevation-2` | raised card, dropdown | ... | ... |
+| `elevation-3` | modal, popover | ... | ... |
+| `elevation-4` | toast, top-most | ... | ... |
+
+[For glass strategy, additionally declare: blur levels (e.g., `blur-sm 12px`, `blur-md 20px`, `blur-lg 40px`), border alpha for edge definition, optional inner-shine convention.]
+
+[For tonal-layers strategy, additionally declare: which surface token from the color system maps to each elevation level, so downstream agents don't reinvent the mapping.]
 
 ---
 
@@ -168,6 +206,12 @@ export default {
       },
       borderRadius: { sm: '4px', md: '8px', lg: '12px', xl: '16px' },
       transitionDuration: { fast: '100ms', base: '150ms', slow: '250ms' },
+      boxShadow: {
+        'elevation-1': 'var(--elevation-1)',
+        'elevation-2': 'var(--elevation-2)',
+        'elevation-3': 'var(--elevation-3)',
+        'elevation-4': 'var(--elevation-4)',
+      },
     },
   },
 }
@@ -187,6 +231,19 @@ export const tokens = { /* same structure */ }
 **Kept as-is:** [list of tokens already present that we're not changing]
 **Added:** [new tokens]
 **Modified:** [tokens whose values changed — with rationale]
+
+## Do's and Don'ts
+
+Guardrails for downstream agents (`design-components`, `frontend-components`) and reviewers. At least 4 do's and 4 don'ts, tied to decisions actually encoded in the tokens above. Generic a11y advice doesn't count — each rule must reference a specific token, contrast pair, or elevation/motion choice from this file.
+
+- **Do** use `accent` only for the single most important action per screen — every additional use dilutes its signal.
+- **Do** pair every status color with its `-foreground` variant; never put raw `text` on `success`/`danger`/`warning`/`info` fills.
+- **Do** cap elevation at `elevation-3` for persistent UI; reserve `elevation-4` for transient toasts only.
+- **Do** use `motion.base` (150ms) for default transitions; `fast` for hover/press, `slow`/`slower` only for layout shifts.
+- **Don't** introduce shadows, radii, or colors outside this file — if something feels missing, extend TOKENS.md rather than hardcoding.
+- **Don't** mix elevation strategies (e.g., shadow cards next to glass cards) within the same view.
+- **Don't** use `text-subtle` for body copy — it only clears AA for UI chrome / metadata.
+- **Don't** animate background or color changes longer than `motion.slow` — it feels laggy.
 ```
 
 ### Step 9: Hand off
@@ -200,6 +257,8 @@ Tell the user: "Tokens specced. These are the only values downstream components 
 - Dark-first means dark palette is designed intentionally (not auto-inverted). Light palette is derived, not the other way around.
 - If the codebase already has a token with the same semantic role but a different name, keep the existing name. Consistency beats purity.
 - All color pairs must pass WCAG AA contrast for their intended use (4.5:1 body text, 3:1 large text / UI). Flag any that don't.
+- Every TOKENS.md must include a Brand & Style preamble, an Elevation & depth section (with a declared strategy), and a Do's and Don'ts block — these drive downstream agents' judgment on edge cases and are non-negotiable.
+- Elevation tokens must have dark AND light values — shadow opacity usually needs to increase in dark mode to remain visible.
 - Read `.pm/<feature>/PROJECT_PROFILE.md` at Step 1. If `designMode: shadcn-theme`, jump to the Shadcn-theme mode section at the end — skip Steps 5–7. The output is a slim TOKENS.md, not a full token system.
 
 ---
@@ -241,6 +300,10 @@ Save to `.design/<feature>/TOKENS.md`:
 ````markdown
 # Design Tokens: [Feature Name] (shadcn-theme mode)
 
+## Brand & Style
+
+[2–3 sentences on aesthetic intent — tone, density, vibe. Even in shadcn mode the narrative helps downstream agents pick between shadcn variants (`default` vs `outline` vs `ghost`) based on feel.]
+
 ## Theme source
 [tweakcn export paste / shadcn preset "<name>" / manual answers]
 
@@ -274,11 +337,24 @@ Save to `.design/<feature>/TOKENS.md`:
 - Sans: Inter, system-ui, sans-serif
 - Mono: JetBrains Mono, monospace
 
+## Elevation & depth (minimal)
+
+**Strategy:** shadow-based (shadcn default). Tailwind's `shadow-sm` / `shadow` / `shadow-md` / `shadow-lg` / `shadow-xl` map to elevations 1–4. If the brief calls for glass or tonal layers instead, switch to `designMode: custom-system` — shadcn-theme mode is not the right container for those strategies.
+
+| Level | Tailwind class | Use |
+|-------|----------------|-----|
+| `elevation-0` | (none) | flat surfaces, inline chrome |
+| `elevation-1` | `shadow-sm` | cards at rest, table rows |
+| `elevation-2` | `shadow-md` | hover cards, dropdowns |
+| `elevation-3` | `shadow-lg` | modals, popovers, sheets |
+| `elevation-4` | `shadow-xl` | toasts |
+
 ## What this mode does NOT include
 - Full spacing scale (shadcn uses Tailwind defaults)
 - Typography scale (shadcn primitives set their own)
 - Motion tokens (shadcn uses Tailwind transition defaults)
 - Z-index scale (shadcn components manage internally)
+- Custom shadow scale (uses Tailwind's defaults — if you need bespoke shadows, switch to `designMode: custom-system`)
 
 ## Contrast verification
 
@@ -292,6 +368,17 @@ Save to `.design/<feature>/TOKENS.md`:
 **Kept as-is:** [list]
 **Added:** [list]
 **Modified:** [list + rationale]
+
+## Do's and Don'ts
+
+At least 3 do's and 3 don'ts tied to this theme's specific choices (radius, primary hue, dark-mode behavior). Generic shadcn advice doesn't count.
+
+- **Do** use `--primary` for the single highest-priority action per screen; secondary actions go to `--secondary` or `ghost` variants.
+- **Do** reach for `--muted-foreground` for metadata/timestamps; keep body copy on `--foreground`.
+- **Do** use `shadow-md` or stronger only for overlays — resting UI sits at `shadow-sm` or flat.
+- **Don't** introduce ad-hoc colors outside the CSS vars — extend `globals.css` or open a token question instead.
+- **Don't** mix `--destructive` with neutral `--primary` in the same CTA group; destructive actions should be visually isolated.
+- **Don't** change `--radius` per-component; shadcn primitives assume a single radius token.
 ````
 
 ### Hand off

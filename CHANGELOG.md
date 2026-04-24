@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.5.0] — 2026-04-24
+
+### Changed
+
+- `design-tokens` — adopts three structural additions from Google Labs' `design.md` spec (https://github.com/google-labs-code/design.md):
+  - **Brand & Style preamble** — 2–4 sentence aesthetic rationale at the top of TOKENS.md, pulled from DESIGN_BRIEF's "Aesthetic direction", so downstream agents (`design-components`, `frontend-components`) can judge edge cases the tokens don't cover.
+  - **Elevation & Depth section** — new Step 7 output with three strategies (shadow-based, tonal-layers, glass-blur). Shadow scale defaults for 5 levels (`elevation-0` through `elevation-4`) with dark/light values. Tailwind `boxShadow` extension added to the primary snippet. Glass and tonal-layer strategies documented with their extra requirements (blur levels + border alpha; surface-to-elevation mapping).
+  - **Do's and Don'ts section** — guardrails block at the end of TOKENS.md, minimum 4 do's + 4 don'ts each tied to specific tokens/contrast pairs/elevation decisions (generic a11y advice doesn't count).
+- `design-tokens` shadcn-theme mode — slim versions of all three additions: Brand & Style (2–3 sentences), minimal elevation table mapping shadcn elevations to Tailwind's `shadow-sm`/`md`/`lg`/`xl`, Do's and Don'ts (min 3 each). Switch to `designMode: custom-system` if the brief calls for glass or tonal-layer elevation.
+- Frontmatter description and Rules updated to make the three sections non-negotiable outputs.
+
 ## [1.4.0] — 2026-04-22
 
 ### Added
